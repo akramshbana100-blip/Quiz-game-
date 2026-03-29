@@ -349,13 +349,13 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 <body>
 
 <!-- LOADING -->
-<div id="loading" class="screen active">
+<div id="loading" class="screen">
   <div class="spinner"></div>
   <div class="loading-text">جاري الاتصال...</div>
 </div>
 
 <!-- ════ LOGIN ════ -->
-<div id="login" class="screen">
+<div id="login" class="screen active">
   <div class="login-box">
     <div class="login-logo">
       <div class="trophy">🏆</div>
@@ -573,12 +573,13 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
     </div>
   </div>
   <div class="question-area">
+    <div id="teamTurnBanner" style="padding:6px 18px;border-radius:10px;font-size:.95rem;font-weight:800;margin-bottom:2px;display:none"></div>
     <div class="cat-badge" id="catBadge">📚</div>
     <div class="question-box" id="questionText"></div>
     <div class="options-grid" id="optionsGrid"></div>
   </div>
   <div class="controls-bar">
-    <div class="score-btns">
+    <div class="score-btns" style="display:none">
       <button class="btn-t1" id="s1btn" onclick="givePoint(1)">+2 فريق 1</button>
       <button class="btn-t2" id="s2btn" onclick="givePoint(2)">+2 فريق 2</button>
     </div>
@@ -868,11 +869,15 @@ window.startSoloGame = function(){
   S.questions=shuffle(allQuestions).map(q=>({...q,assignedTeam:1}));
   S.current=0; S.answered=false;
   document.getElementById('t1label').textContent=currentPlayer;
-  document.getElementById('t2label').textContent='النقاط';
+  document.getElementById('t2label').textContent='';
   document.getElementById('t1mlist').textContent='';
   document.getElementById('t2mlist').textContent='';
-  document.getElementById('s1btn').textContent=`+2 ${currentPlayer}`;
+  document.getElementById('s1btn').style.display='none';
   document.getElementById('s2btn').style.display='none';
+  document.getElementById('t2pts').style.display='none';
+  document.getElementById('t2label').style.display='none';
+  document.getElementById('t2mlist').style.display='none';
+  document.querySelector('.ts2').style.display='none';
   document.getElementById('qTotal').textContent=S.questions.length;
   ss('game'); loadQ();
 };
@@ -886,14 +891,18 @@ window.startGame = function(){
   const t2m=[...document.querySelectorAll('#t2mems input')].map(i=>i.value.trim()).filter(Boolean);
   S.t1={name:t1n,members:t1m,score:0};
   S.t2={name:t2n,members:t2m,score:0};
-  S.questions=shuffle(allQuestions);
+  // كل سؤال لفريق معين بالتناوب
+  S.questions=shuffle(allQuestions).map((q,i)=>({...q,assignedTeam:(i%2===0)?1:2}));
   S.current=0; S.answered=false;
   document.getElementById('t1label').textContent=t1n;
   document.getElementById('t2label').textContent=t2n;
   document.getElementById('t1mlist').textContent=t1m.join(' • ');
   document.getElementById('t2mlist').textContent=t2m.join(' • ');
-  document.getElementById('s1btn').textContent=`+2 ${t1n}`;
-  document.getElementById('s2btn').textContent=`+2 ${t2n}`;
+  document.getElementById('s1btn').style.display='none';
+  document.getElementById('s2btn').style.display='none';
+  document.querySelector('.ts2').style.display='';
+  document.getElementById('t2pts').style.display='';
+  document.getElementById('t2label').style.display='';
   document.getElementById('qTotal').textContent=S.questions.length;
   ss('game'); loadQ();
 };
@@ -905,6 +914,19 @@ function loadQ(){
   document.getElementById('qNum').textContent=S.current+1;
   document.getElementById('catBadge').textContent=q.cat||'📚';
   document.getElementById('questionText').textContent=q.q;
+
+  // بانر دور الفريق
+  const banner=document.getElementById('teamTurnBanner');
+  if(q.assignedTeam){
+    const tName=q.assignedTeam===1?S.t1.name:S.t2.name;
+    const tColor=q.assignedTeam===1?'var(--a)':'var(--b)';
+    banner.style.display='block';
+    banner.style.background=q.assignedTeam===1?'rgba(233,30,140,.15)':'rgba(0,188,212,.15)';
+    banner.style.border=`1.5px solid ${tColor}`;
+    banner.style.color=tColor;
+    banner.textContent=(q.assignedTeam===1?'🔴':'🔵')+' دور '+tName;
+  } else { banner.style.display='none'; }
+
   const grid=document.getElementById('optionsGrid'); grid.innerHTML='';
   ['أ','ب','ج','د'].forEach((l,i)=>{
     const btn=document.createElement('button'); btn.className='opt-btn';
@@ -922,8 +944,18 @@ function reveal(chosen,correct,q){
     if(i===correct)b.classList.add('correct');
     else if(i===chosen&&chosen!==correct)b.classList.add('wrong');
   });
-  if(chosen===correct) showReveal('✅','إجابة صحيحة! 🎉',`الجواب: ${q.opts[correct]}`);
-  else showReveal('❌','إجابة خاطئة!',`الجواب الصحيح: ${q.opts[correct]}`);
+  if(chosen===correct){
+    // إضافة النقاط تلقائياً للفريق أو اللاعب المنفرد
+    const team=q.assignedTeam||1;
+    if(team===1) S.t1.score+=2; else S.t2.score+=2;
+    updateSc();
+    const el=document.getElementById(`t${team}pts`);
+    el.style.transform='scale(1.4)'; setTimeout(()=>el.style.transform='scale(1)',280);
+    const tName=team===1?S.t1.name:S.t2.name;
+    showReveal('✅','إجابة صحيحة! 🎉',`+2 نقطة لـ ${tName}`);
+  } else {
+    showReveal('❌','إجابة خاطئة!',`الجواب الصحيح: ${q.opts[correct]}`);
+  }
 }
 
 function showReveal(e,t,s){
