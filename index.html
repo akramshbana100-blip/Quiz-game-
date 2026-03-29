@@ -279,18 +279,18 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
   border-radius:11px;padding:10px 18px;font-family:'Tajawal',sans-serif;
   font-size:.85rem;font-weight:700;color:var(--wrong);cursor:pointer}
 
-/* Reveal */
-.reveal-overlay{display:none;position:fixed;inset:0;z-index:50;
-  background:rgba(0,0,0,.78);align-items:center;justify-content:center}
-.reveal-overlay.show{display:flex}
-.reveal-box{background:var(--card);border-radius:22px;padding:34px 50px;
-  text-align:center;border:3px solid var(--gold);
-  box-shadow:0 0 60px rgba(255,215,0,.28);
-  animation:popIn .32s cubic-bezier(.34,1.56,.64,1)}
-@keyframes popIn{from{transform:scale(.6);opacity:0}to{transform:scale(1);opacity:1}}
-.reveal-emoji{font-size:3.2rem;margin-bottom:8px}
-.reveal-text{font-size:1.6rem;font-weight:900;margin-bottom:5px}
-.reveal-ans{font-size:1rem;color:var(--dim)}
+/* Reveal - small badge */
+.reveal-overlay{display:none;position:fixed;top:50%;left:50%;
+  transform:translate(-50%,-50%) scale(0.6);z-index:50;pointer-events:none}
+.reveal-overlay.show{display:block;animation:popIn .32s cubic-bezier(.34,1.56,.64,1) forwards}
+@keyframes popIn{from{transform:translate(-50%,-50%) scale(0.6);opacity:0}to{transform:translate(-50%,-50%) scale(1);opacity:1}}
+.reveal-box{background:var(--card);border-radius:16px;padding:16px 28px;
+  text-align:center;border:2px solid var(--gold);
+  box-shadow:0 0 30px rgba(255,215,0,.35);
+  display:flex;align-items:center;gap:12px;white-space:nowrap}
+.reveal-emoji{font-size:1.8rem}
+.reveal-text{font-size:1.1rem;font-weight:900}
+.reveal-ans{font-size:1rem;color:var(--gold);font-weight:800}
 
 /* ─────────────────────────────────────
    SCREEN: FINAL
@@ -408,6 +408,10 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
       <div class="field">
         <label class="label">اسمك</label>
         <input class="inp" id="playerName" type="text" placeholder="أدخل اسمك" dir="rtl">
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:4px">
+        <button class="role-tab active" id="modeTeams" onclick="setMode('teams')" style="flex:1;padding:10px;border:none;background:var(--card2);border-radius:9px;font-family:'Tajawal',sans-serif;font-size:.9rem;font-weight:700;color:var(--dim);cursor:pointer;transition:all .2s">👥 فريقين</button>
+        <button class="role-tab" id="modeSolo" onclick="setMode('solo')" style="flex:1;padding:10px;border:none;background:var(--card2);border-radius:9px;font-family:'Tajawal',sans-serif;font-size:.9rem;font-weight:700;color:var(--dim);cursor:pointer;transition:all .2s">🧑 لاعب واحد</button>
       </div>
     </div>
     <div id="admin-fields" style="display:none">
@@ -543,31 +547,46 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
   <div class="home-body">
     <div class="home-form">
       <h2>🚀 ابدأ جولة جديدة</h2>
-      <div class="teams-row">
-        <div class="team-box tb1">
-          <h3>🔴 الفريق الأول</h3>
-          <input class="inp" id="t1name" type="text" placeholder="اسم الفريق" dir="rtl" style="margin-bottom:10px">
-          <div class="members-area" id="t1mems">
-            <div class="member-row">
-              <span class="mem-num">1</span>
-              <input class="inp" type="text" placeholder="اسم العضو" dir="rtl" style="margin:0">
-            </div>
-          </div>
-          <button class="add-mem-btn" onclick="addMem(1)">+ إضافة عضو</button>
+
+      <!-- Solo Section -->
+      <div id="soloSection" style="display:none">
+        <div style="text-align:center;padding:20px 0">
+          <div style="font-size:3rem;margin-bottom:10px">🧑</div>
+          <div style="font-size:1.1rem;font-weight:800;color:var(--gold)" id="soloNameDisplay"></div>
+          <div style="font-size:.9rem;color:var(--dim);margin-top:6px">ستلعب لوحدك وتتنافس مع نفسك!</div>
         </div>
-        <div class="team-box tb2">
-          <h3>🔵 الفريق الثاني</h3>
-          <input class="inp" id="t2name" type="text" placeholder="اسم الفريق" dir="rtl" style="margin-bottom:10px">
-          <div class="members-area" id="t2mems">
-            <div class="member-row">
-              <span class="mem-num">1</span>
-              <input class="inp" type="text" placeholder="اسم العضو" dir="rtl" style="margin:0">
-            </div>
-          </div>
-          <button class="add-mem-btn" onclick="addMem(2)">+ إضافة عضو</button>
-        </div>
+        <button class="start-btn" onclick="startSoloGame()">🚀 ابدأ اللعبة</button>
       </div>
-      <button class="start-btn" onclick="startGame()">🚀 ابدأ اللعبة</button>
+
+      <!-- Teams Section -->
+      <div id="teamsSection">
+        <div class="teams-row">
+          <div class="team-box tb1">
+            <h3>🔴 الفريق الأول</h3>
+            <input class="inp" id="t1name" type="text" placeholder="اسم الفريق" dir="rtl" style="margin-bottom:10px">
+            <div class="members-area" id="t1mems">
+              <div class="member-row">
+                <span class="mem-num">1</span>
+                <input class="inp" type="text" placeholder="اسم العضو" dir="rtl" style="margin:0">
+              </div>
+            </div>
+            <button class="add-mem-btn" onclick="addMem(1)">+ إضافة عضو</button>
+          </div>
+          <div class="team-box tb2">
+            <h3>🔵 الفريق الثاني</h3>
+            <input class="inp" id="t2name" type="text" placeholder="اسم الفريق" dir="rtl" style="margin-bottom:10px">
+            <div class="members-area" id="t2mems">
+              <div class="member-row">
+                <span class="mem-num">1</span>
+                <input class="inp" type="text" placeholder="اسم العضو" dir="rtl" style="margin:0">
+              </div>
+            </div>
+            <button class="add-mem-btn" onclick="addMem(2)">+ إضافة عضو</button>
+          </div>
+        </div>
+        <button class="start-btn" onclick="startGame()">🚀 ابدأ اللعبة</button>
+      </div>
+
     </div>
   </div>
 </div>
@@ -628,8 +647,10 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 <div class="reveal-overlay" id="revealOverlay">
   <div class="reveal-box">
     <div class="reveal-emoji" id="revealEmoji"></div>
-    <div class="reveal-text" id="revealText"></div>
-    <div class="reveal-ans" id="revealAns"></div>
+    <div>
+      <div class="reveal-text" id="revealText"></div>
+      <div class="reveal-ans" id="revealAns"></div>
+    </div>
   </div>
 </div>
 <div class="toast" id="toast"></div>
@@ -657,6 +678,7 @@ const db = getFirestore(fbApp);
 
 // ── STATE ──
 let currentRole = 'player';
+let currentMode = 'teams';
 let currentPlayer = '';
 let allQuestions = [];
 let S = { t1:{name:'',members:[],score:0}, t2:{name:'',members:[],score:0},
@@ -675,7 +697,13 @@ window.setRole = function(role){
   document.querySelectorAll('.role-tab').forEach((b,i)=>b.classList.toggle('active',(role==='player'&&i===0)||(role==='admin'&&i===1)));
 };
 
-window.doLogin = function(){
+window.setMode = function(mode){
+  currentMode = mode;
+  document.getElementById('modeTeams').style.background = mode==='teams'?'var(--gold)':'var(--card2)';
+  document.getElementById('modeTeams').style.color = mode==='teams'?'#000':'var(--dim)';
+  document.getElementById('modeSolo').style.background = mode==='solo'?'var(--gold)':'var(--card2)';
+  document.getElementById('modeSolo').style.color = mode==='solo'?'#000':'var(--dim)';
+};
   const err = document.getElementById('loginErr');
   err.textContent = '';
   if(currentRole==='admin'){
@@ -688,7 +716,19 @@ window.doLogin = function(){
     if(!name){ err.textContent='❌ أدخل اسمك أولاً'; return; }
     currentPlayer = name;
     document.getElementById('playerBadge').textContent = `👤 ${name}`;
-    ss('home');
+    if(currentMode === 'solo'){
+      // Solo mode: one player vs himself
+      S.t1={name:name,members:[],score:0};
+      S.t2={name:'—',members:[],score:0};
+      ss('home');
+      document.getElementById('soloSection').style.display='block';
+      document.getElementById('teamsSection').style.display='none';
+      document.getElementById('soloNameDisplay').textContent=`مرحباً ${name}! 👋`;
+    } else {
+      ss('home');
+      document.getElementById('soloSection').style.display='none';
+      document.getElementById('teamsSection').style.display='block';
+    }
     loadQuestionsForGame();
   }
 };
@@ -903,6 +943,21 @@ window.addMem = function(team){
   c.appendChild(d);
 };
 
+window.startSoloGame = function(){
+  if(!allQuestions.length){ toast('⚠️ لا توجد أسئلة'); return; }
+  S.t1={name:currentPlayer,members:[],score:0};
+  S.t2={name:'—',members:[],score:0};
+  const shuffled=shuffle(allQuestions);
+  S.questions=shuffled.map((q,i)=>({...q, assignedTeam:1}));
+  S.current=0; S.answered=false;
+  document.getElementById('t1label').textContent=currentPlayer;
+  document.getElementById('t2label').textContent='النقاط';
+  document.getElementById('t1mlist').textContent='';
+  document.getElementById('t2mlist').textContent='';
+  document.getElementById('qTotal').textContent=S.questions.length;
+  ss('game'); loadQ();
+};
+
 // ── START GAME ──
 window.startGame = function(){
   if(!allQuestions.length){ toast('⚠️ لا توجد أسئلة — تواصل مع المدير'); return; }
@@ -955,20 +1010,17 @@ function reveal(chosen,correct,q){
   if(S.answered)return; S.answered=true; stopTimer();
   document.querySelectorAll('.opt-btn').forEach((b,i)=>{
     b.disabled=true;
-    if(i===correct)b.classList.add('correct');
-    else if(i===chosen&&chosen!==correct)b.classList.add('wrong');
   });
   if(chosen===correct){
-    // Auto-score for the team assigned to this question
     const team = q.assignedTeam||1;
     if(team===1) S.t1.score+=2; else S.t2.score+=2;
     updateSc();
     const el=document.getElementById(`t${team}pts`);
     el.style.transform='scale(1.4)'; setTimeout(()=>el.style.transform='scale(1)',280);
     const tName = team===1?S.t1.name:S.t2.name;
-    showReveal('✅',`إجابة صحيحة! +2 لـ ${tName} 🎉`,`الجواب: ${q.opts[correct]}`);
+    showReveal('✅','إجابة صحيحة!',`+2 نقطة لـ ${tName}`);
   } else {
-    showReveal('❌','إجابة خاطئة!',`الجواب الصحيح: ${q.opts[correct]}`);
+    showReveal('❌','إجابة خاطئة!',`الجواب: ${q.opts[correct]}`);
   }
 }
 
