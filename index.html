@@ -3,8 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>صناديد المعرفة 🏆</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏆</text></svg>">
+<title>لعبة الأسئلة 🏆</title>
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;800;900&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -250,11 +249,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
   border:2px solid rgba(255,255,255,.07);border-radius:13px;padding:13px 15px;
   cursor:pointer;font-family:'Tajawal',sans-serif;font-size:.98rem;font-weight:700;
   color:var(--white);text-align:right;transition:transform .15s,border-color .2s,background .2s;width:100%}
-.opt-btn:nth-child(1){border-color:rgba(233,30,140,.4);background:rgba(233,30,140,.06)}
-.opt-btn:nth-child(2){border-color:rgba(0,188,212,.4);background:rgba(0,188,212,.06)}
-.opt-btn:nth-child(3){border-color:rgba(255,109,0,.4);background:rgba(255,109,0,.06)}
-.opt-btn:nth-child(4){border-color:rgba(124,77,255,.4);background:rgba(124,77,255,.06)}
-.opt-btn:hover:not(:disabled){transform:translateY(-2px);filter:brightness(1.2)}
+.opt-btn:hover:not(:disabled){transform:translateY(-2px);border-color:rgba(255,255,255,.22)}
 .opt-btn:disabled{cursor:default}
 .opt-let{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;
   justify-content:center;font-size:.9rem;font-weight:900;flex-shrink:0;color:#fff}
@@ -283,18 +278,18 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
   border-radius:11px;padding:10px 18px;font-family:'Tajawal',sans-serif;
   font-size:.85rem;font-weight:700;color:var(--wrong);cursor:pointer}
 
-/* Reveal - small badge */
-.reveal-overlay{display:none;position:fixed;top:50%;left:50%;
-  transform:translate(-50%,-50%) scale(0.6);z-index:50;pointer-events:none}
-.reveal-overlay.show{display:block;animation:popIn .32s cubic-bezier(.34,1.56,.64,1) forwards}
-@keyframes popIn{from{transform:translate(-50%,-50%) scale(0.6);opacity:0}to{transform:translate(-50%,-50%) scale(1);opacity:1}}
-.reveal-box{background:var(--card);border-radius:16px;padding:16px 28px;
-  text-align:center;border:2px solid var(--gold);
-  box-shadow:0 0 30px rgba(255,215,0,.35);
-  display:flex;align-items:center;gap:12px;white-space:nowrap}
-.reveal-emoji{font-size:1.8rem}
-.reveal-text{font-size:1.1rem;font-weight:900}
-.reveal-ans{font-size:1rem;color:var(--gold);font-weight:800}
+/* Reveal */
+.reveal-overlay{display:none;position:fixed;inset:0;z-index:50;
+  background:rgba(0,0,0,.78);align-items:center;justify-content:center}
+.reveal-overlay.show{display:flex}
+.reveal-box{background:var(--card);border-radius:22px;padding:34px 50px;
+  text-align:center;border:3px solid var(--gold);
+  box-shadow:0 0 60px rgba(255,215,0,.28);
+  animation:popIn .32s cubic-bezier(.34,1.56,.64,1)}
+@keyframes popIn{from{transform:scale(.6);opacity:0}to{transform:scale(1);opacity:1}}
+.reveal-emoji{font-size:3.2rem;margin-bottom:8px}
+.reveal-text{font-size:1.6rem;font-weight:900;margin-bottom:5px}
+.reveal-ans{font-size:1rem;color:var(--dim)}
 
 /* ─────────────────────────────────────
    SCREEN: FINAL
@@ -326,43 +321,6 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 .confetti-container{position:fixed;inset:0;pointer-events:none;z-index:100;overflow:hidden}
 .confetti-piece{position:absolute;top:-20px;animation:fall linear forwards}
 @keyframes fall{to{transform:translateY(110vh) rotate(720deg);opacity:0}}
-
-/* Team Turn Banner */
-.team-turn-banner{display:flex;align-items:center;justify-content:center;gap:10px;
-  padding:8px 20px;font-size:1rem;font-weight:800;border-radius:12px;margin-bottom:8px;
-  transition:all .3s}
-.team-turn-banner.t1{background:rgba(233,30,140,.15);color:var(--a);border:1.5px solid var(--a)}
-.team-turn-banner.t2{background:rgba(0,188,212,.15);color:var(--b);border:1.5px solid var(--b)}
-
-/* AI Generate Button */
-.ai-gen-btn{background:linear-gradient(135deg,#7c3aed,#a78bfa);border:none;
-  border-radius:12px;padding:12px 22px;font-family:'Tajawal',sans-serif;
-  font-size:.95rem;font-weight:800;color:#fff;cursor:pointer;
-  box-shadow:0 4px 20px rgba(124,58,237,.4);transition:transform .15s,opacity .2s;
-  display:flex;align-items:center;gap:8px;width:100%;justify-content:center;margin-bottom:14px}
-.ai-gen-btn:hover{transform:translateY(-2px)}
-.ai-gen-btn:disabled{opacity:.6;cursor:not-allowed;transform:none}
-.ai-gen-progress{background:rgba(124,58,237,.1);border:1.5px solid rgba(124,58,237,.3);
-  border-radius:12px;padding:14px;margin-bottom:14px;display:none;text-align:center}
-.ai-gen-progress.show{display:block}
-.ai-gen-progress .ai-loading{color:var(--admin);font-size:.95rem;font-weight:700}
-.ai-gen-count{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
-.ai-gen-count label{color:var(--dim);font-size:.88rem}
-.ai-gen-count input{width:70px;background:var(--card2);border:1.5px solid rgba(255,255,255,.1);
-  border-radius:8px;padding:7px 10px;color:var(--white);font-family:'Tajawal',sans-serif;
-  font-size:.95rem;outline:none;text-align:center}
-.ai-gen-count input:focus{border-color:var(--admin)}
-.ai-topic-inp{flex:1;min-width:150px}
-
-/* Remote Control Hint */
-.remote-hint{position:fixed;bottom:10px;right:14px;
-  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);
-  border-radius:10px;padding:6px 12px;font-size:.72rem;color:var(--dim);
-  z-index:10;pointer-events:none}
-
-/* Keyboard nav focus */
-.opt-btn:focus{outline:3px solid var(--gold);outline-offset:2px}
-.next-btn:focus,.end-btn:focus{outline:3px solid var(--gold);outline-offset:2px}
 
 /* Toast */
 .toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(60px);
@@ -414,8 +372,8 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
         <input class="inp" id="playerName" type="text" placeholder="أدخل اسمك" dir="rtl">
       </div>
       <div style="display:flex;gap:8px;margin-bottom:4px">
-        <button class="role-tab active" id="modeTeams" onclick="setMode('teams')" style="flex:1;padding:10px;border:none;background:var(--card2);border-radius:9px;font-family:'Tajawal',sans-serif;font-size:.9rem;font-weight:700;color:var(--dim);cursor:pointer;transition:all .2s">👥 فريقين</button>
-        <button class="role-tab" id="modeSolo" onclick="setMode('solo')" style="flex:1;padding:10px;border:none;background:var(--card2);border-radius:9px;font-family:'Tajawal',sans-serif;font-size:.9rem;font-weight:700;color:var(--dim);cursor:pointer;transition:all .2s">🧑 لاعب واحد</button>
+        <button id="modeTeams" onclick="setMode('teams')" style="flex:1;padding:10px;border:none;background:var(--gold);border-radius:9px;font-family:'Tajawal',sans-serif;font-size:.9rem;font-weight:700;color:#000;cursor:pointer;transition:all .2s">👥 فريقين</button>
+        <button id="modeSolo" onclick="setMode('solo')" style="flex:1;padding:10px;border:none;background:var(--card2);border-radius:9px;font-family:'Tajawal',sans-serif;font-size:.9rem;font-weight:700;color:var(--dim);cursor:pointer;transition:all .2s">🧑 منفرد</button>
       </div>
     </div>
     <div id="admin-fields" style="display:none">
@@ -451,19 +409,15 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
     </div>
 
     <!-- AI Generate -->
-    <div style="margin-bottom:4px">
-      <div class="ai-gen-count" style="margin-bottom:10px;gap:8px;flex-wrap:wrap">
-        <span style="color:var(--admin);font-weight:800;font-size:.95rem">🤖 توليد أسئلة بالذكاء الاصطناعي</span>
-      </div>
+    <div style="margin-bottom:16px;background:var(--card);border-radius:16px;padding:18px;border:1.5px solid rgba(167,139,250,.15)">
+      <div style="color:var(--admin);font-weight:800;font-size:.95rem;margin-bottom:10px">🤖 توليد أسئلة بالذكاء الاصطناعي</div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;align-items:center">
-        <input class="inp ai-topic-inp" id="aiTopic" type="text" placeholder="الموضوع (مثال: تاريخ، علوم، رياضة...)" dir="rtl" style="flex:1;min-width:160px">
-        <input class="ai-gen-count" id="aiCount" type="number" min="5" max="30" value="10" style="width:70px;background:var(--card2);border:1.5px solid rgba(255,255,255,.1);border-radius:8px;padding:7px 10px;color:var(--white);font-family:Tajawal,sans-serif;font-size:.95rem;outline:none;text-align:center">
-        <label style="color:var(--dim);font-size:.85rem">سؤال</label>
+        <input class="inp" id="aiTopic" type="text" placeholder="الموضوع (مثال: تاريخ، علوم، رياضة...)" dir="rtl" style="flex:1;min-width:150px">
+        <input id="aiCount" type="number" min="5" max="30" value="10" style="width:65px;background:var(--card2);border:1.5px solid rgba(255,255,255,.1);border-radius:8px;padding:7px 10px;color:var(--white);font-family:'Tajawal',sans-serif;font-size:.95rem;outline:none;text-align:center">
+        <span style="color:var(--dim);font-size:.85rem">سؤال</span>
       </div>
-      <button class="ai-gen-btn" id="aiGenBtn" onclick="generateAIQuestions()">🤖 توليد أسئلة جاهزة</button>
-      <div class="ai-gen-progress" id="aiGenProgress">
-        <div class="ai-loading">⏳ <span id="aiGenMsg">جاري التوليد...</span></div>
-      </div>
+      <button id="aiGenBtn" onclick="generateAIQuestions()" style="width:100%;background:linear-gradient(135deg,#7c3aed,#a78bfa);border:none;border-radius:10px;padding:11px;font-family:'Tajawal',sans-serif;font-size:.95rem;font-weight:800;color:#fff;cursor:pointer;margin-bottom:8px">🤖 توليد أسئلة جاهزة</button>
+      <div id="aiGenProgress" style="display:none;background:rgba(124,58,237,.1);border:1px solid rgba(124,58,237,.3);border-radius:10px;padding:10px;text-align:center;color:var(--admin);font-weight:700;font-size:.9rem" id="aiGenMsg">⏳ جاري التوليد...</div>
     </div>
 
     <!-- Upload Zone -->
@@ -533,7 +487,6 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
   <div id="panel-history" class="a-panel">
     <div class="panel-header">
       <h2>📊 سجل الجولات</h2>
-      <button onclick="deleteAllHistory()" style="background:rgba(255,23,68,.12);border:1.5px solid var(--wrong);border-radius:8px;padding:7px 16px;font-family:'Tajawal',sans-serif;font-size:.85rem;font-weight:700;color:var(--wrong);cursor:pointer">🗑 حذف الكل</button>
     </div>
     <div id="adminHistList"><div class="empty-msg">⏳ جاري التحميل...</div></div>
   </div>
@@ -552,44 +505,42 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
     <div class="home-form">
       <h2>🚀 ابدأ جولة جديدة</h2>
 
-      <!-- Solo Section -->
-      <div id="soloSection" style="display:none">
-        <div style="text-align:center;padding:20px 0">
-          <div style="font-size:3rem;margin-bottom:10px">🧑</div>
-          <div style="font-size:1.1rem;font-weight:800;color:var(--gold)" id="soloNameDisplay"></div>
-          <div style="font-size:.9rem;color:var(--dim);margin-top:6px">ستلعب لوحدك وتتنافس مع نفسك!</div>
-        </div>
+      <!-- Solo -->
+      <div id="soloSection" style="display:none;text-align:center;padding:20px 0">
+        <div style="font-size:3rem;margin-bottom:10px">🧑</div>
+        <div style="font-size:1.1rem;font-weight:800;color:var(--gold)" id="soloNameDisplay"></div>
+        <div style="font-size:.9rem;color:var(--dim);margin-top:6px;margin-bottom:20px">العب لوحدك واجمع أكبر نقاط!</div>
         <button class="start-btn" onclick="startSoloGame()">🚀 ابدأ اللعبة</button>
       </div>
 
-      <!-- Teams Section -->
+      <!-- Teams -->
       <div id="teamsSection">
         <div class="teams-row">
-          <div class="team-box tb1">
-            <h3>🔴 الفريق الأول</h3>
-            <input class="inp" id="t1name" type="text" placeholder="اسم الفريق" dir="rtl" style="margin-bottom:10px">
-            <div class="members-area" id="t1mems">
-              <div class="member-row">
-                <span class="mem-num">1</span>
-                <input class="inp" type="text" placeholder="اسم العضو" dir="rtl" style="margin:0">
-              </div>
+        <div class="team-box tb1">
+          <h3>🔴 الفريق الأول</h3>
+          <input class="inp" id="t1name" type="text" placeholder="اسم الفريق" dir="rtl" style="margin-bottom:10px">
+          <div class="members-area" id="t1mems">
+            <div class="member-row">
+              <span class="mem-num">1</span>
+              <input class="inp" type="text" placeholder="اسم العضو" dir="rtl" style="margin:0">
             </div>
-            <button class="add-mem-btn" onclick="addMem(1)">+ إضافة عضو</button>
           </div>
-          <div class="team-box tb2">
-            <h3>🔵 الفريق الثاني</h3>
-            <input class="inp" id="t2name" type="text" placeholder="اسم الفريق" dir="rtl" style="margin-bottom:10px">
-            <div class="members-area" id="t2mems">
-              <div class="member-row">
-                <span class="mem-num">1</span>
-                <input class="inp" type="text" placeholder="اسم العضو" dir="rtl" style="margin:0">
-              </div>
-            </div>
-            <button class="add-mem-btn" onclick="addMem(2)">+ إضافة عضو</button>
-          </div>
+          <button class="add-mem-btn" onclick="addMem(1)">+ إضافة عضو</button>
         </div>
-        <button class="start-btn" onclick="startGame()">🚀 ابدأ اللعبة</button>
+        <div class="team-box tb2">
+          <h3>🔵 الفريق الثاني</h3>
+          <input class="inp" id="t2name" type="text" placeholder="اسم الفريق" dir="rtl" style="margin-bottom:10px">
+          <div class="members-area" id="t2mems">
+            <div class="member-row">
+              <span class="mem-num">1</span>
+              <input class="inp" type="text" placeholder="اسم العضو" dir="rtl" style="margin:0">
+            </div>
+          </div>
+          <button class="add-mem-btn" onclick="addMem(2)">+ إضافة عضو</button>
+        </div>
       </div>
+      <button class="start-btn" onclick="startGame()">🚀 ابدأ اللعبة</button>
+      </div><!-- end teamsSection -->
 
     </div>
   </div>
@@ -622,19 +573,19 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
     </div>
   </div>
   <div class="question-area">
-    <div class="team-turn-banner" id="teamTurnBanner">🔴 دور الفريق</div>
     <div class="cat-badge" id="catBadge">📚</div>
     <div class="question-box" id="questionText"></div>
     <div class="options-grid" id="optionsGrid"></div>
   </div>
   <div class="controls-bar">
-    <button class="next-btn" id="nextBtn" onclick="nextQ()">التالي ⬅</button>
+    <div class="score-btns">
+      <button class="btn-t1" id="s1btn" onclick="givePoint(1)">+2 فريق 1</button>
+      <button class="btn-t2" id="s2btn" onclick="givePoint(2)">+2 فريق 2</button>
+    </div>
+    <button class="next-btn" onclick="nextQ()">التالي ⬅</button>
     <button class="end-btn" onclick="confirmEnd()">⏹ إنهاء</button>
   </div>
 </div>
-
-<!-- Remote Hint -->
-<div class="remote-hint">⬆⬇ اختر · OK تأكيد · ← التالي</div>
 
 <!-- ════ FINAL ════ -->
 <div id="final" class="screen">
@@ -651,10 +602,8 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 <div class="reveal-overlay" id="revealOverlay">
   <div class="reveal-box">
     <div class="reveal-emoji" id="revealEmoji"></div>
-    <div>
-      <div class="reveal-text" id="revealText"></div>
-      <div class="reveal-ans" id="revealAns"></div>
-    </div>
+    <div class="reveal-text" id="revealText"></div>
+    <div class="reveal-ans" id="revealAns"></div>
   </div>
 </div>
 <div class="toast" id="toast"></div>
@@ -686,7 +635,7 @@ let currentMode = 'teams';
 let currentPlayer = '';
 let allQuestions = [];
 let S = { t1:{name:'',members:[],score:0}, t2:{name:'',members:[],score:0},
-          questions:[], current:0, answered:false, timerInterval:null, timeLeft:15, focusedOpt:0 };
+          questions:[], current:0, answered:false, timerInterval:null, timeLeft:15 };
 
 // ── UTILS ──
 function ss(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
@@ -708,6 +657,8 @@ window.setMode = function(mode){
   document.getElementById('modeSolo').style.background = mode==='solo'?'var(--gold)':'var(--card2)';
   document.getElementById('modeSolo').style.color = mode==='solo'?'#000':'var(--dim)';
 };
+
+window.doLogin = function(){
   const err = document.getElementById('loginErr');
   err.textContent = '';
   if(currentRole==='admin'){
@@ -720,19 +671,15 @@ window.setMode = function(mode){
     if(!name){ err.textContent='❌ أدخل اسمك أولاً'; return; }
     currentPlayer = name;
     document.getElementById('playerBadge').textContent = `👤 ${name}`;
-    if(currentMode === 'solo'){
-      // Solo mode: one player vs himself
-      S.t1={name:name,members:[],score:0};
-      S.t2={name:'—',members:[],score:0};
-      ss('home');
+    if(currentMode==='solo'){
       document.getElementById('soloSection').style.display='block';
       document.getElementById('teamsSection').style.display='none';
       document.getElementById('soloNameDisplay').textContent=`مرحباً ${name}! 👋`;
     } else {
-      ss('home');
       document.getElementById('soloSection').style.display='none';
       document.getElementById('teamsSection').style.display='block';
     }
+    ss('home');
     loadQuestionsForGame();
   }
 };
@@ -760,23 +707,13 @@ async function loadQuestionsAdmin(){
   }
 }
 
-// ── LOAD QUESTIONS (Game) - with local cache ──
+// ── LOAD QUESTIONS (Game) ──
 async function loadQuestionsForGame(){
-  // Load from cache immediately for speed
-  try {
-    const cached = sessionStorage.getItem('cachedQuestions');
-    if(cached){
-      allQuestions = JSON.parse(cached);
-      console.log('✅ Loaded from cache:', allQuestions.length);
-    }
-  } catch(e){}
-  // Then refresh from Firebase in background
   try {
     const snap = await getDocs(collection(db,'questions'));
     allQuestions = [];
     snap.forEach(d=>allQuestions.push({id:d.id,...d.data()}));
-    sessionStorage.setItem('cachedQuestions', JSON.stringify(allQuestions));
-  } catch(e){ if(!allQuestions.length) toast('⚠️ تعذّر تحميل الأسئلة'); }
+  } catch(e){ toast('⚠️ تعذّر تحميل الأسئلة'); }
 }
 
 // ── RENDER Q LIST ──
@@ -895,7 +832,7 @@ async function loadAdminHistory(){
     if(snap.empty){list.innerHTML='<div class="empty-msg">لا توجد جولات بعد</div>';return}
     list.innerHTML='';
     snap.forEach(d=>{
-      const g=d.data(); const gid=d.id;
+      const g=d.data();
       const date=g.date?.toDate?g.date.toDate().toLocaleDateString('ar-SA',{day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'}):'—';
       const div=document.createElement('div'); div.className='hist-card';
       div.innerHTML=`
@@ -908,56 +845,34 @@ async function loadAdminHistory(){
           <div class="hs t1c"><div class="hs-name">${g.team1?.name||''}</div><div class="hs-pts">${g.team1?.score??0}</div></div>
           <div class="hs t2c"><div class="hs-name">${g.team2?.name||''}</div><div class="hs-pts">${g.team2?.score??0}</div></div>
         </div>
-        <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">
-          <div class="winner-tag">${g.winner==='تعادل'?'🤝 تعادل':'🏆 '+g.winner}</div>
-          <button class="q-del" onclick="deleteGame('${gid}')">🗑 حذف</button>
-        </div>`;
+        <div class="winner-tag">${g.winner==='تعادل'?'🤝 تعادل':'🏆 '+g.winner}</div>`;
       list.appendChild(div);
     });
   } catch(e){ list.innerHTML='<div class="empty-msg">⚠️ تعذّر التحميل</div>'; }
 }
-
-window.deleteGame = async function(id){
-  if(!confirm('حذف هذه المباراة؟')) return;
-  try {
-    await deleteDoc(doc(db,'games',id));
-    toast('🗑 تم حذف المباراة');
-    await loadAdminHistory();
-  } catch(e){ toast('❌ فشل الحذف'); }
-};
-
-window.deleteAllHistory = async function(){
-  if(!confirm('حذف كل السجل نهائياً؟')) return;
-  try {
-    const snap=await getDocs(collection(db,'games'));
-    const batch=writeBatch(db);
-    snap.forEach(d=>batch.delete(d.ref));
-    await batch.commit();
-    toast('🗑 تم حذف كل السجل');
-    await loadAdminHistory();
-  } catch(e){ toast('❌ فشل الحذف'); }
-};
 
 // ── ADD MEMBER ──
 window.addMem = function(team){
   const c=document.getElementById(`t${team}mems`);
   const n=c.querySelectorAll('.member-row').length+1;
   const d=document.createElement('div'); d.className='member-row';
-  d.innerHTML=`<span class="mem-num">${n}</span><input class="inp" type="text" placeholder="اسم العضو ${n}" dir="rtl" style="margin:0"><button onclick="this.parentElement.remove()" style="background:rgba(255,23,68,.15);border:1px solid var(--wrong);border-radius:7px;padding:5px 10px;color:var(--wrong);cursor:pointer;font-size:.85rem;flex-shrink:0">✕</button>`;
+  d.innerHTML=`<span class="mem-num">${n}</span><input class="inp" type="text" placeholder="اسم العضو ${n}" dir="rtl" style="margin:0">`;
   c.appendChild(d);
 };
 
+// ── START SOLO GAME ──
 window.startSoloGame = function(){
-  if(!allQuestions.length){ toast('⚠️ لا توجد أسئلة'); return; }
+  if(!allQuestions.length){ toast('⚠️ لا توجد أسئلة — تواصل مع المدير'); return; }
   S.t1={name:currentPlayer,members:[],score:0};
-  S.t2={name:'—',members:[],score:0};
-  const shuffled=shuffle(allQuestions);
-  S.questions=shuffled.map((q,i)=>({...q, assignedTeam:1}));
+  S.t2={name:'',members:[],score:0};
+  S.questions=shuffle(allQuestions).map(q=>({...q,assignedTeam:1}));
   S.current=0; S.answered=false;
   document.getElementById('t1label').textContent=currentPlayer;
   document.getElementById('t2label').textContent='النقاط';
   document.getElementById('t1mlist').textContent='';
   document.getElementById('t2mlist').textContent='';
+  document.getElementById('s1btn').textContent=`+2 ${currentPlayer}`;
+  document.getElementById('s2btn').style.display='none';
   document.getElementById('qTotal').textContent=S.questions.length;
   ss('game'); loadQ();
 };
@@ -971,14 +886,14 @@ window.startGame = function(){
   const t2m=[...document.querySelectorAll('#t2mems input')].map(i=>i.value.trim()).filter(Boolean);
   S.t1={name:t1n,members:t1m,score:0};
   S.t2={name:t2n,members:t2m,score:0};
-  const shuffled=shuffle(allQuestions);
-  // Assign alternating teams to each question
-  S.questions=shuffled.map((q,i)=>({...q, assignedTeam:(i%2===0)?1:2}));
+  S.questions=shuffle(allQuestions);
   S.current=0; S.answered=false;
   document.getElementById('t1label').textContent=t1n;
   document.getElementById('t2label').textContent=t2n;
   document.getElementById('t1mlist').textContent=t1m.join(' • ');
   document.getElementById('t2mlist').textContent=t2m.join(' • ');
+  document.getElementById('s1btn').textContent=`+2 ${t1n}`;
+  document.getElementById('s2btn').textContent=`+2 ${t2n}`;
   document.getElementById('qTotal').textContent=S.questions.length;
   ss('game'); loadQ();
 };
@@ -990,23 +905,13 @@ function loadQ(){
   document.getElementById('qNum').textContent=S.current+1;
   document.getElementById('catBadge').textContent=q.cat||'📚';
   document.getElementById('questionText').textContent=q.q;
-
-  // Show which team this question belongs to
-  const banner=document.getElementById('teamTurnBanner');
-  const tName = q.assignedTeam===1 ? S.t1.name : S.t2.name;
-  banner.textContent = (q.assignedTeam===1?'🔴':'🔵') + ' دور ' + tName;
-  banner.className = 'team-turn-banner ' + (q.assignedTeam===1?'t1':'t2');
-
   const grid=document.getElementById('optionsGrid'); grid.innerHTML='';
-  S.focusedOpt = 0;
   ['أ','ب','ج','د'].forEach((l,i)=>{
     const btn=document.createElement('button'); btn.className='opt-btn';
     btn.innerHTML=`<span class="opt-let">${l}</span><span>${q.opts[i]}</span>`;
     btn.onclick=()=>reveal(i,q.ans,q);
-    btn.setAttribute('data-idx',i);
     grid.appendChild(btn);
   });
-  updateFocus();
   startTimer(); updateSc();
 }
 
@@ -1014,49 +919,12 @@ function reveal(chosen,correct,q){
   if(S.answered)return; S.answered=true; stopTimer();
   document.querySelectorAll('.opt-btn').forEach((b,i)=>{
     b.disabled=true;
+    if(i===correct)b.classList.add('correct');
+    else if(i===chosen&&chosen!==correct)b.classList.add('wrong');
   });
-  if(chosen===correct){
-    const team = q.assignedTeam||1;
-    if(team===1) S.t1.score+=2; else S.t2.score+=2;
-    updateSc();
-    const el=document.getElementById(`t${team}pts`);
-    el.style.transform='scale(1.4)'; setTimeout(()=>el.style.transform='scale(1)',280);
-    const tName = team===1?S.t1.name:S.t2.name;
-    showReveal('✅','إجابة صحيحة!',`+2 نقطة لـ ${tName}`);
-  } else {
-    showReveal('❌','إجابة خاطئة!',`الجواب: ${q.opts[correct]}`);
-  }
+  if(chosen===correct) showReveal('✅','إجابة صحيحة! 🎉',`الجواب: ${q.opts[correct]}`);
+  else showReveal('❌','إجابة خاطئة!',`الجواب الصحيح: ${q.opts[correct]}`);
 }
-
-// Remote control focus helpers
-function updateFocus(){
-  const btns=[...document.querySelectorAll('.opt-btn')];
-  btns.forEach((b,i)=>{ if(i===S.focusedOpt) b.focus(); });
-}
-
-// ── KEYBOARD / REMOTE CONTROL ──
-document.addEventListener('keydown', e=>{
-  const screen = document.querySelector('.screen.active');
-  if(!screen || screen.id !== 'game') return;
-  const btns = [...document.querySelectorAll('.opt-btn:not(:disabled)')];
-  if(!btns.length) {
-    if(e.key==='ArrowLeft'||e.key==='Enter') nextQ();
-    return;
-  }
-  if(e.key==='ArrowDown'||e.key==='ArrowRight'){
-    e.preventDefault();
-    S.focusedOpt = (S.focusedOpt+1)%4; updateFocus();
-  } else if(e.key==='ArrowUp'||e.key==='ArrowLeft'){
-    e.preventDefault();
-    S.focusedOpt = (S.focusedOpt+3)%4; updateFocus();
-  } else if(e.key==='Enter'||e.key===' '){
-    e.preventDefault();
-    if(S.answered){ nextQ(); }
-    else { btns[S.focusedOpt]?.click(); }
-  } else if(e.key==='MediaFastForward'||e.key==='PageDown'){
-    nextQ();
-  }
-});
 
 function showReveal(e,t,s){
   document.getElementById('revealEmoji').textContent=e;
@@ -1065,6 +933,14 @@ function showReveal(e,t,s){
   const ov=document.getElementById('revealOverlay');
   ov.classList.add('show'); setTimeout(()=>ov.classList.remove('show'),2200);
 }
+
+window.givePoint=function(team){
+  if(team===1)S.t1.score+=2; else S.t2.score+=2;
+  updateSc();
+  const el=document.getElementById(`t${team}pts`);
+  el.style.transform='scale(1.4)'; setTimeout(()=>el.style.transform='scale(1)',280);
+  toast(`+2 لـ ${team===1?S.t1.name:S.t2.name} 🎯`);
+};
 
 function updateSc(){
   document.getElementById('t1pts').textContent=S.t1.score;
@@ -1148,79 +1024,40 @@ function launchConfetti(){
   }
 }
 
-// ── AI GENERATE QUESTIONS ──
+// ── AI GENERATE ──
 window.generateAIQuestions = async function(){
   const topic = document.getElementById('aiTopic').value.trim() || 'معلومات عامة';
   const count = parseInt(document.getElementById('aiCount').value) || 10;
   const btn = document.getElementById('aiGenBtn');
   const progress = document.getElementById('aiGenProgress');
-  const msg = document.getElementById('aiGenMsg');
-
-  btn.disabled = true;
-  progress.classList.add('show');
-  msg.textContent = `🤖 جاري توليد ${count} سؤال عن "${topic}"...`;
-
+  btn.disabled=true; progress.style.display='block';
+  progress.textContent=`⏳ جاري توليد ${count} سؤال عن "${topic}"...`;
   try {
-    const p1='gsk_3R9SHIndjMIzvXbQSm';
-    const p2='TnWGdyb3FYhKXmyMoDMo';
-    const p3='3d1j2jcedZeTBw';
-    const GROQ_KEY = p1+p2+p3;
-    const prompt = `أنت مولّد أسئلة مسابقات باللغة العربية. أنشئ ${count} سؤال اختياري متنوع عن موضوع: "${topic}".
-يجب أن يكون الرد JSON فقط بدون أي نص إضافي أو backticks، بهذا الشكل بالضبط:
-[{"q":"نص السؤال؟","opts":["خيار أ","خيار ب","خيار ج","خيار د"],"ans":0,"cat":"${topic}"},...]
-حيث ans هو رقم الإجابة الصحيحة (0=أ، 1=ب، 2=ج، 3=د).
-الأسئلة يجب أن تكون واضحة ومتدرجة الصعوبة ومختلفة عن بعضها.`;
-
-    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${GROQ_KEY}`
-      },
-      body: JSON.stringify({
-        model: 'llama-3.3-70b-versatile',
-        messages: [{role: 'user', content: prompt}],
-        temperature: 0.8,
-        max_tokens: 4000
-      })
-    });
-    const data = await res.json();
+    const p1='gsk_3R9SHIndjMIzvXbQSm'; const p2='TnWGdyb3FYhKXmyMoDMo'; const p3='3d1j2jcedZeTBw';
+    const KEY=p1+p2+p3;
+    const prompt=`أنت مولّد أسئلة مسابقات باللغة العربية. أنشئ ${count} سؤال اختياري متنوع عن موضوع: "${topic}". يجب أن يكون الرد JSON فقط بدون أي نص إضافي أو backticks: [{"q":"السؤال؟","opts":["أ","ب","ج","د"],"ans":0,"cat":"${topic}"},...]`;
+    const res=await fetch('https://api.groq.com/openai/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${KEY}`},body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[{role:'user',content:prompt}],temperature:0.8,max_tokens:4000})});
+    const data=await res.json();
     if(data.error) throw new Error(data.error.message);
-    const text = data.choices?.[0]?.message?.content || '';
-    const clean = text.replace(/```json|```/g,'').trim();
-    const questions = JSON.parse(clean);
-    if(!Array.isArray(questions)||!questions.length) throw new Error('صيغة خاطئة من الذكاء الاصطناعي');
-
-    msg.textContent = `⏳ جاري رفع ${questions.length} سؤال إلى قاعدة البيانات...`;
-
-    // Clear old then upload new
-    const oldSnap = await getDocs(collection(db,'questions'));
-    const batch1 = writeBatch(db);
-    oldSnap.forEach(d=>batch1.delete(d.ref));
-    await batch1.commit();
-
-    const batch2 = writeBatch(db);
-    questions.forEach((q,i)=>{
-      const ref = doc(collection(db,'questions'));
-      batch2.set(ref,{q:q.q,opts:q.opts,ans:parseInt(q.ans),cat:q.cat||topic,order:i});
-    });
-    await batch2.commit();
-
-    msg.textContent = `✅ تم توليد ${questions.length} سؤال بنجاح!`;
-    toast(`🤖 تم توليد ${questions.length} سؤال!`);
+    const text=data.choices?.[0]?.message?.content||'';
+    const questions=JSON.parse(text.replace(/```json|```/g,'').trim());
+    if(!Array.isArray(questions)||!questions.length) throw new Error('صيغة خاطئة');
+    progress.textContent=`⏳ جاري رفع ${questions.length} سؤال...`;
+    const oldSnap=await getDocs(collection(db,'questions'));
+    const b1=writeBatch(db); oldSnap.forEach(d=>b1.delete(d.ref)); await b1.commit();
+    const b2=writeBatch(db);
+    questions.forEach((q,i)=>{ const ref=doc(collection(db,'questions')); b2.set(ref,{q:q.q,opts:q.opts,ans:parseInt(q.ans),cat:q.cat||topic,order:i}); });
+    await b2.commit();
+    progress.textContent=`✅ تم توليد ${questions.length} سؤال!`;
+    toast(`🤖 ${questions.length} سؤال جاهز!`);
     await loadQuestionsAdmin();
-    setTimeout(()=>progress.classList.remove('show'),3000);
-  } catch(err){
-    msg.textContent = `❌ خطأ: ${err.message}`;
-    toast('❌ فشل التوليد');
-  }
-  btn.disabled = false;
+    setTimeout(()=>{progress.style.display='none'},3000);
+  } catch(err){ progress.textContent=`❌ خطأ: ${err.message}`; }
+  btn.disabled=false;
 };
 
 // ── INIT ──
-function init(){
-  ss('login');
-}
+function init(){ ss('login'); }
 init();
 </script>
 </body>
