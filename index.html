@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>لعبة الأسئلة 🏆</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#07071a;--card:#0f0f2a;--card2:#1a1a40;
+  --gold:#ffd700;--gold2:#ffaa00;
+  --white:#fff;--dim:#8892b0;
+  --correct:#00e676;--wrong:#ff1744;
+  --a:#e91e8c;--b:#00bcd4;--c:#ff6d00;--d:#7c4dff;
+  --admin:#a78bfa;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--white);min-height:100vh}
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:radial-gradient(1px 1px at 15% 25%,rgba(255,255,255,.4) 0%,transparent 100%),
+  radial-gradient(1px 1px at 45% 70%,rgba(255,255,255,.3) 0%,transparent 100%),
+  radial-gradient(1px 1px at 70% 15%,rgba(255,255,255,.5) 0%,transparent 100%),
+  radial-gradient(1px 1px at 85% 55%,rgba(255,255,255,.3) 0%,transparent 100%),
+  radial-gradient(1px 1px at 30% 85%,rgba(255,255,255,.4) 0%,transparent 100%)}
+
+/* ── SCREENS ── */
+.screen{display:none;position:relative;z-index:1}
+.screen.active{display:flex;flex-direction:column;min-height:100vh}
+
+/* ── SHARED INPUTS ── */
+.inp{width:100%;background:var(--card2);border:1.5px solid rgba(255,255,255,.1);
+  border-radius:10px;padding:11px 14px;font-family:'Tajawal',sans-serif;
+  font-size:1rem;color:var(--white);outline:none;direction:rtl;
+  transition:border-color .2s}
+.inp:focus{border-color:var(--gold)}
+.inp::placeholder{color:var(--dim)}
+.label{font-size:.85rem;color:var(--dim);margin-bottom:6px;display:block}
+.field{margin-bottom:14px}
+
+/* ─────────────────────────────────────
+   SCREEN: LOGIN
+───────────────────────────────────── */
+#login{align-items:center;justify-content:center;padding:30px 20px;gap:0}
+.login-box{background:var(--card);border-radius:24px;padding:40px 36px;
+  width:100%;max-width:420px;border:1.5px solid rgba(255,255,255,.07);
+  box-shadow:0 8px 60px rgba(0,0,0,.5)}
+.login-logo{text-align:center;margin-bottom:28px}
+.login-logo .trophy{font-size:3.5rem}
+.login-logo h1{font-size:1.8rem;font-weight:900;color:var(--gold);margin-top:8px}
+.login-logo p{color:var(--dim);font-size:.95rem;margin-top:4px}
+
+.role-tabs{display:flex;gap:0;background:var(--card2);border-radius:12px;
+  padding:4px;margin-bottom:22px}
+.role-tab{flex:1;padding:10px;border:none;background:transparent;
+  font-family:'Tajawal',sans-serif;font-size:.95rem;font-weight:700;
+  color:var(--dim);cursor:pointer;border-radius:9px;transition:all .2s}
+.role-tab.active{background:var(--gold);color:#000}
+
+.login-btn{width:100%;margin-top:6px;background:linear-gradient(135deg,var(--gold),var(--gold2));
+  color:#000;border:none;border-radius:12px;padding:14px;
+  font-family:'Tajawal',sans-serif;font-size:1.15rem;font-weight:900;
+  cursor:pointer;box-shadow:0 4px 24px rgba(255,215,0,.35);transition:transform .15s}
+.login-btn:hover{transform:translateY(-2px)}
+.login-error{color:var(--wrong);font-size:.88rem;text-align:center;
+  margin-top:10px;min-height:20px}
+
+/* ─────────────────────────────────────
+   SCREEN: ADMIN PANEL
+───────────────────────────────────── */
+#admin{padding:0}
+.admin-header{background:var(--card);border-bottom:2px solid rgba(167,139,250,.2);
+  padding:16px 28px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.admin-header h1{font-size:1.3rem;font-weight:900;color:var(--admin)}
+.admin-header-right{display:flex;align-items:center;gap:12px}
+.conn-dot{font-size:.82rem}
+.logout-btn{background:rgba(255,23,68,.12);border:1.5px solid var(--wrong);
+  border-radius:8px;padding:7px 16px;font-family:'Tajawal',sans-serif;
+  font-size:.85rem;font-weight:700;color:var(--wrong);cursor:pointer}
+
+.admin-tabs{display:flex;background:var(--card2);border-bottom:2px solid rgba(255,255,255,.06)}
+.a-tab{flex:1;padding:13px;border:none;background:transparent;
+  font-family:'Tajawal',sans-serif;font-size:.95rem;font-weight:700;
+  color:var(--dim);cursor:pointer;border-bottom:3px solid transparent;transition:all .2s}
+.a-tab.active{color:var(--admin);border-bottom-color:var(--admin)}
+
+.a-panel{display:none;padding:24px;flex:1;overflow-y:auto}
+.a-panel.active{display:block}
+
+/* Questions Panel */
+.panel-header{display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:20px;flex-wrap:wrap;gap:12px}
+.panel-header h2{font-size:1.15rem;font-weight:800;color:var(--admin)}
+.q-count-badge{background:rgba(167,139,250,.15);color:var(--admin);
+  border:1px solid rgba(167,139,250,.3);border-radius:20px;
+  padding:4px 14px;font-size:.85rem;font-weight:700}
+
+/* Upload Zone */
+.upload-zone{background:var(--card);border:2px dashed rgba(167,139,250,.35);
+  border-radius:18px;padding:32px;text-align:center;cursor:pointer;
+  transition:border-color .2s,background .2s;margin-bottom:20px;position:relative}
+.upload-zone:hover,.upload-zone.drag{border-color:var(--admin);background:rgba(167,139,250,.06)}
+.upload-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.upload-icon{font-size:2.5rem;margin-bottom:10px}
+.upload-title{font-size:1.05rem;font-weight:800;color:var(--admin);margin-bottom:6px}
+.upload-sub{font-size:.85rem;color:var(--dim)}
+.upload-format{margin-top:12px;background:var(--card2);border-radius:10px;
+  padding:10px 14px;font-size:.8rem;color:var(--dim);text-align:right;direction:ltr}
+
+.upload-status{padding:12px 16px;border-radius:12px;font-size:.95rem;font-weight:700;
+  margin-bottom:16px;display:none}
+.upload-status.success{background:rgba(0,230,118,.1);border:1.5px solid var(--correct);color:var(--correct);display:block}
+.upload-status.error{background:rgba(255,23,68,.1);border:1.5px solid var(--wrong);color:var(--wrong);display:block}
+
+/* Questions List */
+.q-list{display:flex;flex-direction:column;gap:10px;max-height:420px;overflow-y:auto}
+.q-item{background:var(--card);border-radius:12px;padding:14px 16px;
+  border:1.5px solid rgba(255,255,255,.06);display:flex;
+  align-items:flex-start;gap:12px}
+.q-num{width:28px;height:28px;border-radius:8px;background:rgba(167,139,250,.2);
+  color:var(--admin);display:flex;align-items:center;justify-content:center;
+  font-size:.8rem;font-weight:800;flex-shrink:0;margin-top:2px}
+.q-content{flex:1;min-width:0}
+.q-text{font-size:.95rem;font-weight:700;margin-bottom:6px;line-height:1.4}
+.q-opts{display:flex;flex-wrap:wrap;gap:6px}
+.q-opt{padding:3px 10px;border-radius:6px;font-size:.78rem;
+  background:var(--card2);border:1px solid rgba(255,255,255,.08)}
+.q-opt.correct-opt{background:rgba(0,230,118,.15);border-color:var(--correct);color:var(--correct)}
+.q-cat{font-size:.75rem;color:var(--dim);margin-top:5px}
+.q-actions{display:flex;gap:6px;flex-shrink:0}
+.q-del{background:rgba(255,23,68,.1);border:1px solid rgba(255,23,68,.3);
+  border-radius:7px;padding:5px 10px;color:var(--wrong);
+  font-size:.8rem;cursor:pointer;font-family:'Tajawal',sans-serif;font-weight:700}
+.q-del:hover{background:rgba(255,23,68,.2)}
+
+/* Add Question */
+.add-q-form{background:var(--card);border-radius:16px;padding:22px;
+  border:1.5px solid rgba(167,139,250,.15);margin-bottom:20px}
+.add-q-form h3{font-size:1rem;font-weight:800;color:var(--admin);margin-bottom:16px}
+.opts-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.opt-field{position:relative}
+.opt-label{position:absolute;right:12px;top:50%;transform:translateY(-50%);
+  font-size:.8rem;font-weight:800;color:var(--dim);pointer-events:none}
+.opt-input{padding-right:32px!important}
+.correct-sel{width:100%;background:var(--card2);border:1.5px solid rgba(255,255,255,.1);
+  border-radius:10px;padding:10px 14px;font-family:'Tajawal',sans-serif;
+  font-size:.95rem;color:var(--white);outline:none;direction:rtl;
+  appearance:none;cursor:pointer}
+.correct-sel:focus{border-color:var(--gold)}
+.add-q-btn{background:linear-gradient(135deg,var(--admin),#7c3aed);
+  border:none;border-radius:10px;padding:11px 24px;
+  font-family:'Tajawal',sans-serif;font-size:.95rem;font-weight:800;
+  color:#fff;cursor:pointer;transition:transform .1s}
+.add-q-btn:hover{transform:translateY(-1px)}
+
+/* History Panel */
+.hist-card{background:var(--card);border-radius:14px;padding:18px 22px;
+  border:1.5px solid rgba(255,255,255,.06);margin-bottom:12px;
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+.hist-info .hist-date{font-size:.8rem;color:var(--dim);margin-bottom:4px}
+.hist-info .hist-teams{font-size:1rem;font-weight:800}
+.hist-scores{display:flex;gap:14px}
+.hs{text-align:center}
+.hs-name{font-size:.75rem;color:var(--dim)}
+.hs-pts{font-size:1.4rem;font-weight:900}
+.hs.t1c .hs-pts{color:var(--a)}
+.hs.t2c .hs-pts{color:var(--b)}
+.winner-tag{background:rgba(255,215,0,.12);color:var(--gold);
+  border:1px solid rgba(255,215,0,.3);border-radius:16px;
+  padding:3px 12px;font-size:.8rem;font-weight:700}
+.empty-msg{text-align:center;color:var(--dim);padding:40px;font-size:1rem}
+
+/* ─────────────────────────────────────
+   SCREEN: HOME (PLAYER)
+───────────────────────────────────── */
+#home{padding:0}
+.home-header{background:var(--card);border-bottom:2px solid rgba(255,215,0,.12);
+  padding:18px 28px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.home-header h1{font-size:1.4rem;font-weight:900;color:var(--gold)}
+.home-header-right{display:flex;align-items:center;gap:12px}
+.player-badge{background:rgba(0,188,212,.1);border:1px solid rgba(0,188,212,.3);
+  border-radius:20px;padding:4px 14px;font-size:.85rem;color:var(--b)}
+
+.home-body{padding:24px;max-width:720px;margin:0 auto;width:100%}
+.home-form{background:var(--card);border-radius:20px;padding:28px}
+.home-form h2{font-size:1.2rem;font-weight:800;color:var(--gold);margin-bottom:20px}
+.teams-row{display:flex;gap:18px;flex-wrap:wrap}
+.team-box{flex:1;min-width:220px}
+.team-box h3{font-size:1rem;font-weight:700;margin-bottom:10px}
+.team-box.tb1 h3{color:var(--a)}
+.team-box.tb2 h3{color:var(--b)}
+.members-area{display:flex;flex-direction:column;gap:7px;margin-bottom:8px}
+.member-row{display:flex;gap:8px;align-items:center}
+.mem-num{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;
+  justify-content:center;font-size:.75rem;font-weight:800;flex-shrink:0;color:#fff}
+.tb1 .mem-num{background:var(--a)}
+.tb2 .mem-num{background:var(--b)}
+.add-mem-btn{width:100%;background:none;border:1.5px dashed rgba(255,255,255,.12);
+  border-radius:9px;color:var(--dim);padding:7px;cursor:pointer;
+  font-family:'Tajawal',sans-serif;font-size:.88rem;transition:all .2s}
+.add-mem-btn:hover{border-color:var(--gold);color:var(--gold)}
+.start-btn{width:100%;margin-top:20px;
+  background:linear-gradient(135deg,var(--gold),var(--gold2));
+  color:#000;border:none;border-radius:13px;padding:15px;
+  font-family:'Tajawal',sans-serif;font-size:1.2rem;font-weight:900;
+  cursor:pointer;box-shadow:0 5px 24px rgba(255,215,0,.35);transition:transform .15s}
+.start-btn:hover{transform:translateY(-2px)}
+
+/* ─────────────────────────────────────
+   SCREEN: GAME
+───────────────────────────────────── */
+#game{padding:0}
+.top-bar{display:flex;align-items:stretch;background:var(--card);
+  border-bottom:2px solid rgba(255,215,0,.12);min-height:86px}
+.team-score{flex:1;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;padding:10px 16px;gap:2px}
+.team-score.ts1{background:linear-gradient(135deg,rgba(233,30,140,.12),transparent);border-left:3px solid var(--a)}
+.team-score.ts2{background:linear-gradient(135deg,rgba(0,188,212,.12),transparent);border-right:3px solid var(--b)}
+.ts-name{font-size:.88rem;font-weight:700}
+.ts1 .ts-name{color:var(--a)}
+.ts2 .ts-name{color:var(--b)}
+.ts-pts{font-size:2.6rem;font-weight:900;line-height:1;transition:transform .2s}
+.ts1 .ts-pts{color:var(--a)}
+.ts2 .ts-pts{color:var(--b)}
+.ts-mems{font-size:.68rem;color:var(--dim);text-align:center}
+.center-info{display:flex;flex-direction:column;align-items:center;
+  justify-content:center;padding:10px 20px;gap:4px;min-width:130px}
+.vs-badge{font-size:1.1rem;font-weight:900;color:var(--gold)}
+.timer-ring{position:relative;width:50px;height:50px}
+.timer-ring svg{transform:rotate(-90deg)}
+.timer-ring circle.bg{stroke:rgba(255,255,255,.07)}
+.timer-ring circle.fg{stroke:var(--gold);stroke-linecap:round;
+  transition:stroke-dashoffset .9s linear,stroke .3s}
+.timer-num{position:absolute;inset:0;display:flex;align-items:center;
+  justify-content:center;font-size:1.1rem;font-weight:900;color:var(--gold)}
+.q-counter{font-size:.78rem;color:var(--dim)}
+.q-counter span{color:var(--gold);font-weight:800}
+
+.question-area{flex:1;display:flex;flex-direction:column;
+  align-items:center;padding:20px 30px 12px;gap:14px}
+.cat-badge{padding:4px 16px;border-radius:18px;font-size:.85rem;font-weight:700;
+  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09)}
+.question-box{width:100%;max-width:820px;background:var(--card);border-radius:16px;
+  padding:22px 28px;font-size:clamp(1.05rem,2.4vw,1.55rem);font-weight:800;
+  text-align:center;line-height:1.5;border:2px solid rgba(255,215,0,.12);
+  box-shadow:0 4px 28px rgba(0,0,0,.4)}
+.options-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px;
+  width:100%;max-width:820px}
+.opt-btn{display:flex;align-items:center;gap:11px;background:var(--card);
+  border:2px solid rgba(255,255,255,.07);border-radius:13px;padding:13px 15px;
+  cursor:pointer;font-family:'Tajawal',sans-serif;font-size:.98rem;font-weight:700;
+  color:var(--white);text-align:right;transition:transform .15s,border-color .2s,background .2s;width:100%}
+.opt-btn:hover:not(:disabled){transform:translateY(-2px);border-color:rgba(255,255,255,.22)}
+.opt-btn:disabled{cursor:default}
+.opt-let{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;
+  justify-content:center;font-size:.9rem;font-weight:900;flex-shrink:0;color:#fff}
+.opt-btn:nth-child(1) .opt-let{background:var(--a)}
+.opt-btn:nth-child(2) .opt-let{background:var(--b)}
+.opt-btn:nth-child(3) .opt-let{background:var(--c)}
+.opt-btn:nth-child(4) .opt-let{background:var(--d)}
+.opt-btn.correct{background:rgba(0,230,118,.12);border-color:var(--correct)}
+.opt-btn.wrong{background:rgba(255,23,68,.08);border-color:var(--wrong);opacity:.55}
+
+.controls-bar{display:flex;align-items:center;justify-content:center;
+  gap:9px;padding:11px 24px 18px;flex-wrap:wrap}
+.score-btns{display:flex;gap:7px}
+.score-btns button{padding:10px 16px;border-radius:9px;border:none;
+  font-family:'Tajawal',sans-serif;font-size:.88rem;font-weight:800;
+  cursor:pointer;transition:transform .1s}
+.score-btns button:active{transform:scale(.95)}
+.btn-t1{background:var(--a);color:#fff}
+.btn-t2{background:var(--b);color:#fff}
+.next-btn{background:linear-gradient(135deg,var(--gold),var(--gold2));border:none;
+  border-radius:11px;padding:10px 24px;font-family:'Tajawal',sans-serif;
+  font-size:.93rem;font-weight:900;color:#000;cursor:pointer;
+  box-shadow:0 3px 16px rgba(255,215,0,.3);transition:transform .1s}
+.next-btn:hover{transform:translateY(-2px)}
+.end-btn{background:rgba(255,23,68,.1);border:1.5px solid var(--wrong);
+  border-radius:11px;padding:10px 18px;font-family:'Tajawal',sans-serif;
+  font-size:.85rem;font-weight:700;color:var(--wrong);cursor:pointer}
+
+/* Reveal */
+.reveal-overlay{display:none;position:fixed;inset:0;z-index:50;
+  background:rgba(0,0,0,.78);align-items:center;justify-content:center}
+.reveal-overlay.show{display:flex}
+.reveal-box{background:var(--card);border-radius:22px;padding:34px 50px;
+  text-align:center;border:3px solid var(--gold);
+  box-shadow:0 0 60px rgba(255,215,0,.28);
+  animation:popIn .32s cubic-bezier(.34,1.56,.64,1)}
+@keyframes popIn{from{transform:scale(.6);opacity:0}to{transform:scale(1);opacity:1}}
+.reveal-emoji{font-size:3.2rem;margin-bottom:8px}
+.reveal-text{font-size:1.6rem;font-weight:900;margin-bottom:5px}
+.reveal-ans{font-size:1rem;color:var(--dim)}
+
+/* ─────────────────────────────────────
+   SCREEN: FINAL
+───────────────────────────────────── */
+#final{align-items:center;justify-content:center;text-align:center;gap:24px;padding:36px}
+.winner-trophy{font-size:4.5rem;animation:bounce 1s infinite alternate}
+@keyframes bounce{from{transform:translateY(0)}to{transform:translateY(-13px)}}
+.winner-title{font-size:clamp(1.7rem,4vw,2.8rem);font-weight:900;color:var(--gold)}
+.winner-sub{font-size:1.1rem;color:var(--dim)}
+.final-scores{display:flex;gap:20px;flex-wrap:wrap;justify-content:center}
+.final-card{background:var(--card);border-radius:16px;padding:24px 40px;min-width:160px}
+.final-card.winner-card{border:3px solid var(--gold);box-shadow:0 0 45px rgba(255,215,0,.25)}
+.final-card.loser-card{border:2px solid rgba(255,255,255,.08);opacity:.8}
+.fc-name{font-size:.95rem;font-weight:700;margin-bottom:5px}
+.fc1 .fc-name{color:var(--a)}
+.fc2 .fc-name{color:var(--b)}
+.fc-pts{font-size:2.9rem;font-weight:900;line-height:1}
+.fc1 .fc-pts{color:var(--a)}
+.fc2 .fc-pts{color:var(--b)}
+.fc-lbl{font-size:.8rem;color:var(--dim);margin-top:3px}
+.saving-msg{font-size:.9rem;color:var(--dim);min-height:22px}
+.replay-btn{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#000;
+  border:none;border-radius:13px;padding:14px 46px;
+  font-family:'Tajawal',sans-serif;font-size:1.2rem;font-weight:900;
+  cursor:pointer;box-shadow:0 5px 24px rgba(255,215,0,.38);transition:transform .15s}
+.replay-btn:hover{transform:translateY(-2px)}
+
+/* Confetti */
+.confetti-container{position:fixed;inset:0;pointer-events:none;z-index:100;overflow:hidden}
+.confetti-piece{position:absolute;top:-20px;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg);opacity:0}}
+
+/* Toast */
+.toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(60px);
+  background:var(--card2);border:1.5px solid rgba(255,215,0,.25);
+  border-radius:11px;padding:10px 24px;font-size:.94rem;font-weight:700;
+  color:var(--white);z-index:200;transition:transform .3s,opacity .3s;
+  opacity:0;pointer-events:none;white-space:nowrap}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+
+/* Loading */
+#loading{align-items:center;justify-content:center;gap:18px}
+.spinner{width:56px;height:56px;border:4px solid rgba(255,215,0,.15);
+  border-top-color:var(--gold);border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-text{font-size:1.2rem;color:var(--dim)}
+
+@media(max-width:620px){
+  .teams-row,.opts-row{flex-direction:column}
+  .options-grid{grid-template-columns:1fr}
+  .ts-pts{font-size:2rem}
+  .controls-bar{gap:6px}
+  .reveal-box{padding:28px 30px}
+}
+</style>
+</head>
+<body>
+
+<!-- LOADING -->
+<div id="loading" class="screen active">
+  <div class="spinner"></div>
+  <div class="loading-text">جاري الاتصال...</div>
+</div>
+
+<!-- ════ LOGIN ════ -->
+<div id="login" class="screen">
+  <div class="login-box">
+    <div class="login-logo">
+      <div class="trophy">🏆</div>
+      <h1>لعبة الأسئلة</h1>
+      <p>سجّل دخولك للبدء</p>
+    </div>
+    <div class="role-tabs">
+      <button class="role-tab active" onclick="setRole('player')">🎮 لاعب</button>
+      <button class="role-tab" onclick="setRole('admin')">⚙️ مدير</button>
+    </div>
+    <div id="player-fields">
+      <div class="field">
+        <label class="label">اسمك</label>
+        <input class="inp" id="playerName" type="text" placeholder="أدخل اسمك" dir="rtl">
+      </div>
+    </div>
+    <div id="admin-fields" style="display:none">
+      <div class="field">
+        <label class="label">كود المدير السري</label>
+        <input class="inp" id="adminCode" type="password" placeholder="••••••••" dir="ltr">
+      </div>
+    </div>
+    <button class="login-btn" onclick="doLogin()">دخول ←</button>
+    <div class="login-error" id="loginErr"></div>
+  </div>
+</div>
+
+<!-- ════ ADMIN PANEL ════ -->
+<div id="admin" class="screen">
+  <div class="admin-header">
+    <h1>⚙️ لوحة المدير</h1>
+    <div class="admin-header-right">
+      <span class="conn-dot" id="connStatus">🟡 جاري الاتصال</span>
+      <button class="logout-btn" onclick="logout()">خروج</button>
+    </div>
+  </div>
+  <div class="admin-tabs">
+    <button class="a-tab active" onclick="adminTab('questions')">📝 الأسئلة</button>
+    <button class="a-tab" onclick="adminTab('history')">📊 السجل</button>
+  </div>
+
+  <!-- Questions Panel -->
+  <div id="panel-questions" class="a-panel active">
+    <div class="panel-header">
+      <h2>📝 إدارة الأسئلة</h2>
+      <span class="q-count-badge" id="qCountBadge">0 سؤال</span>
+    </div>
+
+    <!-- Upload Zone -->
+    <div class="upload-zone" id="uploadZone">
+      <input type="file" accept=".json" id="jsonFile" onchange="handleFileUpload(event)">
+      <div class="upload-icon">📂</div>
+      <div class="upload-title">ارفع ملف JSON لتغيير جميع الأسئلة</div>
+      <div class="upload-sub">اسحب الملف هنا أو اضغط للاختيار</div>
+      <div class="upload-format">
+        الصيغة المطلوبة:<br>
+        [{"q":"السؤال؟","opts":["أ","ب","ج","د"],"ans":0,"cat":"🌍 جغرافيا"}, ...]<br>
+        <em>ans = رقم الإجابة الصحيحة (0=أ، 1=ب، 2=ج، 3=د)</em>
+      </div>
+    </div>
+    <div class="upload-status" id="uploadStatus"></div>
+
+    <!-- Add Single Question -->
+    <div class="add-q-form">
+      <h3>➕ إضافة سؤال واحد</h3>
+      <div class="field">
+        <label class="label">نص السؤال</label>
+        <input class="inp" id="newQ" type="text" placeholder="اكتب السؤال هنا..." dir="rtl">
+      </div>
+      <div class="opts-row">
+        <div class="opt-field field">
+          <label class="label">الخيار أ</label>
+          <input class="inp opt-input" id="opt0" type="text" placeholder="الخيار الأول" dir="rtl">
+        </div>
+        <div class="opt-field field">
+          <label class="label">الخيار ب</label>
+          <input class="inp opt-input" id="opt1" type="text" placeholder="الخيار الثاني" dir="rtl">
+        </div>
+        <div class="opt-field field">
+          <label class="label">الخيار ج</label>
+          <input class="inp opt-input" id="opt2" type="text" placeholder="الخيار الثالث" dir="rtl">
+        </div>
+        <div class="opt-field field">
+          <label class="label">الخيار د</label>
+          <input class="inp opt-input" id="opt3" type="text" placeholder="الخيار الرابع" dir="rtl">
+        </div>
+      </div>
+      <div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap">
+        <div class="field" style="flex:1;min-width:150px;margin:0">
+          <label class="label">الإجابة الصحيحة</label>
+          <select class="correct-sel" id="newAns">
+            <option value="0">أ - الخيار الأول</option>
+            <option value="1">ب - الخيار الثاني</option>
+            <option value="2">ج - الخيار الثالث</option>
+            <option value="3">د - الخيار الرابع</option>
+          </select>
+        </div>
+        <div class="field" style="flex:1;min-width:150px;margin:0">
+          <label class="label">الفئة</label>
+          <input class="inp" id="newCat" type="text" placeholder="🌍 جغرافيا" dir="rtl" value="💡 معلومات عامة">
+        </div>
+        <button class="add-q-btn" onclick="addSingleQuestion()">إضافة السؤال ✓</button>
+      </div>
+    </div>
+
+    <!-- Questions List -->
+    <div class="q-list" id="qList">
+      <div class="empty-msg">⏳ جاري التحميل...</div>
+    </div>
+  </div>
+
+  <!-- History Panel -->
+  <div id="panel-history" class="a-panel">
+    <div class="panel-header">
+      <h2>📊 سجل الجولات</h2>
+    </div>
+    <div id="adminHistList"><div class="empty-msg">⏳ جاري التحميل...</div></div>
+  </div>
+</div>
+
+<!-- ════ HOME (PLAYER) ════ -->
+<div id="home" class="screen">
+  <div class="home-header">
+    <h1>🏆 لعبة الأسئلة</h1>
+    <div class="home-header-right">
+      <span class="player-badge" id="playerBadge">👤 لاعب</span>
+      <button class="logout-btn" onclick="logout()">خروج</button>
+    </div>
+  </div>
+  <div class="home-body">
+    <div class="home-form">
+      <h2>🚀 ابدأ جولة جديدة</h2>
+      <div class="teams-row">
+        <div class="team-box tb1">
+          <h3>🔴 الفريق الأول</h3>
+          <input class="inp" id="t1name" type="text" placeholder="اسم الفريق" dir="rtl" style="margin-bottom:10px">
+          <div class="members-area" id="t1mems">
+            <div class="member-row">
+              <span class="mem-num">1</span>
+              <input class="inp" type="text" placeholder="اسم العضو" dir="rtl" style="margin:0">
+            </div>
+          </div>
+          <button class="add-mem-btn" onclick="addMem(1)">+ إضافة عضو</button>
+        </div>
+        <div class="team-box tb2">
+          <h3>🔵 الفريق الثاني</h3>
+          <input class="inp" id="t2name" type="text" placeholder="اسم الفريق" dir="rtl" style="margin-bottom:10px">
+          <div class="members-area" id="t2mems">
+            <div class="member-row">
+              <span class="mem-num">1</span>
+              <input class="inp" type="text" placeholder="اسم العضو" dir="rtl" style="margin:0">
+            </div>
+          </div>
+          <button class="add-mem-btn" onclick="addMem(2)">+ إضافة عضو</button>
+        </div>
+      </div>
+      <button class="start-btn" onclick="startGame()">🚀 ابدأ اللعبة</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════ GAME ════ -->
+<div id="game" class="screen">
+  <div class="top-bar">
+    <div class="team-score ts1">
+      <div class="ts-name" id="t1label">الفريق 1</div>
+      <div class="ts-pts" id="t1pts">0</div>
+      <div class="ts-mems" id="t1mlist"></div>
+    </div>
+    <div class="center-info">
+      <div class="vs-badge">VS</div>
+      <div class="timer-ring">
+        <svg width="50" height="50" viewBox="0 0 50 50">
+          <circle class="bg" cx="25" cy="25" r="21" fill="none" stroke-width="4"/>
+          <circle class="fg" id="timerCircle" cx="25" cy="25" r="21" fill="none"
+            stroke-width="4" stroke-dasharray="131.9" stroke-dashoffset="0"/>
+        </svg>
+        <div class="timer-num" id="timerNum">15</div>
+      </div>
+      <div class="q-counter">سؤال <span id="qNum">1</span>/<span id="qTotal">?</span></div>
+    </div>
+    <div class="team-score ts2">
+      <div class="ts-name" id="t2label">الفريق 2</div>
+      <div class="ts-pts" id="t2pts">0</div>
+      <div class="ts-mems" id="t2mlist"></div>
+    </div>
+  </div>
+  <div class="question-area">
+    <div class="cat-badge" id="catBadge">📚</div>
+    <div class="question-box" id="questionText"></div>
+    <div class="options-grid" id="optionsGrid"></div>
+  </div>
+  <div class="controls-bar">
+    <div class="score-btns">
+      <button class="btn-t1" id="s1btn" onclick="givePoint(1)">+2 فريق 1</button>
+      <button class="btn-t2" id="s2btn" onclick="givePoint(2)">+2 فريق 2</button>
+    </div>
+    <button class="next-btn" onclick="nextQ()">التالي ⬅</button>
+    <button class="end-btn" onclick="confirmEnd()">⏹ إنهاء</button>
+  </div>
+</div>
+
+<!-- ════ FINAL ════ -->
+<div id="final" class="screen">
+  <div class="confetti-container" id="confettiEl"></div>
+  <div class="winner-trophy" id="winTrophy">🏆</div>
+  <div class="winner-title" id="winTitle"></div>
+  <div class="winner-sub" id="winSub"></div>
+  <div class="final-scores" id="finalScores"></div>
+  <div class="saving-msg" id="savingMsg"></div>
+  <button class="replay-btn" onclick="goHome()">🏠 العودة للرئيسية</button>
+</div>
+
+<!-- Reveal -->
+<div class="reveal-overlay" id="revealOverlay">
+  <div class="reveal-box">
+    <div class="reveal-emoji" id="revealEmoji"></div>
+    <div class="reveal-text" id="revealText"></div>
+    <div class="reveal-ans" id="revealAns"></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import {
+  getFirestore, collection, addDoc, getDocs, setDoc, deleteDoc,
+  doc, orderBy, query, serverTimestamp, writeBatch, onSnapshot
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+// ── CONFIG ──
+const ADMIN_CODE = "admin1234"; // غيّر هذا الكود
+
+const firebaseConfig = {
+  apiKey: "AIzaSyApsPVQFeYrloCOnJe23fOtJXC2yTpzhuI",
+  authDomain: "quiz-game-a7eae.firebaseapp.com",
+  projectId: "quiz-game-a7eae",
+  storageBucket: "quiz-game-a7eae.firebasestorage.app",
+  messagingSenderId: "987637765600",
+  appId: "1:987637765600:web:a88cd81de7610ba4358785"
+};
+const fbApp = initializeApp(firebaseConfig);
+const db = getFirestore(fbApp);
+
+// ── STATE ──
+let currentRole = 'player';
+let currentPlayer = '';
+let allQuestions = [];
+let S = { t1:{name:'',members:[],score:0}, t2:{name:'',members:[],score:0},
+          questions:[], current:0, answered:false, timerInterval:null, timeLeft:15 };
+
+// ── UTILS ──
+function ss(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
+function toast(msg,ms=2500){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),ms); }
+function shuffle(arr){ const a=[...arr]; for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+
+// ── LOGIN ──
+window.setRole = function(role){
+  currentRole = role;
+  document.getElementById('player-fields').style.display = role==='player'?'block':'none';
+  document.getElementById('admin-fields').style.display  = role==='admin' ?'block':'none';
+  document.querySelectorAll('.role-tab').forEach((b,i)=>b.classList.toggle('active',(role==='player'&&i===0)||(role==='admin'&&i===1)));
+};
+
+window.doLogin = function(){
+  const err = document.getElementById('loginErr');
+  err.textContent = '';
+  if(currentRole==='admin'){
+    const code = document.getElementById('adminCode').value.trim();
+    if(code !== ADMIN_CODE){ err.textContent='❌ الكود غير صحيح'; return; }
+    ss('admin');
+    loadQuestionsAdmin();
+  } else {
+    const name = document.getElementById('playerName').value.trim();
+    if(!name){ err.textContent='❌ أدخل اسمك أولاً'; return; }
+    currentPlayer = name;
+    document.getElementById('playerBadge').textContent = `👤 ${name}`;
+    ss('home');
+    loadQuestionsForGame();
+  }
+};
+
+window.logout = function(){
+  document.getElementById('adminCode').value='';
+  document.getElementById('playerName').value='';
+  document.getElementById('loginErr').textContent='';
+  ss('login');
+};
+
+// ── LOAD QUESTIONS (Admin) ──
+async function loadQuestionsAdmin(){
+  document.getElementById('connStatus').textContent='🟡 جاري الاتصال';
+  try {
+    const snap = await getDocs(collection(db,'questions'));
+    allQuestions = [];
+    snap.forEach(d=>allQuestions.push({id:d.id,...d.data()}));
+    allQuestions.sort((a,b)=>(a.order||0)-(b.order||0));
+    renderQList();
+    document.getElementById('connStatus').textContent='🟢 متصل';
+  } catch(e){
+    document.getElementById('connStatus').textContent='🔴 غير متصل';
+    toast('⚠️ تعذّر التحميل');
+  }
+}
+
+// ── LOAD QUESTIONS (Game) ──
+async function loadQuestionsForGame(){
+  try {
+    const snap = await getDocs(collection(db,'questions'));
+    allQuestions = [];
+    snap.forEach(d=>allQuestions.push({id:d.id,...d.data()}));
+  } catch(e){ toast('⚠️ تعذّر تحميل الأسئلة'); }
+}
+
+// ── RENDER Q LIST ──
+function renderQList(){
+  const list = document.getElementById('qList');
+  document.getElementById('qCountBadge').textContent = `${allQuestions.length} سؤال`;
+  if(!allQuestions.length){ list.innerHTML='<div class="empty-msg">لا توجد أسئلة — ارفع ملف JSON أو أضف سؤالاً</div>'; return; }
+  list.innerHTML='';
+  allQuestions.forEach((q,i)=>{
+    const div=document.createElement('div'); div.className='q-item';
+    div.innerHTML=`
+      <div class="q-num">${i+1}</div>
+      <div class="q-content">
+        <div class="q-text">${q.q}</div>
+        <div class="q-opts">
+          ${q.opts.map((o,oi)=>`<span class="q-opt ${oi===q.ans?'correct-opt':''}">${['أ','ب','ج','د'][oi]}) ${o}</span>`).join('')}
+        </div>
+        <div class="q-cat">${q.cat||''}</div>
+      </div>
+      <div class="q-actions">
+        <button class="q-del" onclick="deleteQ('${q.id}')">🗑 حذف</button>
+      </div>`;
+    list.appendChild(div);
+  });
+}
+
+// ── UPLOAD JSON ──
+window.handleFileUpload = async function(e){
+  const file = e.target.files[0]; if(!file) return;
+  const status = document.getElementById('uploadStatus');
+  status.className='upload-status'; status.textContent='⏳ جاري المعالجة...'; status.style.display='block';
+  try {
+    const text = await file.text();
+    const data = JSON.parse(text);
+    if(!Array.isArray(data)||!data.length) throw new Error('الملف فارغ أو غير صحيح');
+    // Validate
+    data.forEach((q,i)=>{
+      if(!q.q||!Array.isArray(q.opts)||q.opts.length!==4||q.ans===undefined)
+        throw new Error(`السؤال ${i+1} ناقص أو غير صحيح`);
+    });
+    // Delete all old then write new
+    status.textContent='⏳ جاري حذف الأسئلة القديمة...';
+    const oldSnap = await getDocs(collection(db,'questions'));
+    const batch1 = writeBatch(db);
+    oldSnap.forEach(d=>batch1.delete(d.ref));
+    await batch1.commit();
+    // Write new in batches of 500
+    status.textContent='⏳ جاري رفع الأسئلة الجديدة...';
+    for(let i=0;i<data.length;i+=400){
+      const batch2 = writeBatch(db);
+      data.slice(i,i+400).forEach((q,j)=>{
+        const ref = doc(collection(db,'questions'));
+        batch2.set(ref,{q:q.q,opts:q.opts,ans:parseInt(q.ans),cat:q.cat||'💡 معلومات عامة',order:i+j});
+      });
+      await batch2.commit();
+    }
+    status.className='upload-status success';
+    status.textContent=`✅ تم! تم رفع ${data.length} سؤال بنجاح — الأسئلة القديمة حُذفت`;
+    document.getElementById('jsonFile').value='';
+    await loadQuestionsAdmin();
+    toast(`✅ ${data.length} سؤال جديد`);
+  } catch(err){
+    status.className='upload-status error';
+    status.textContent=`❌ خطأ: ${err.message}`;
+  }
+};
+
+// Drag & drop
+const uz = document.getElementById('uploadZone');
+uz.addEventListener('dragover',e=>{e.preventDefault();uz.classList.add('drag')});
+uz.addEventListener('dragleave',()=>uz.classList.remove('drag'));
+uz.addEventListener('drop',e=>{
+  e.preventDefault(); uz.classList.remove('drag');
+  const f=e.dataTransfer.files[0]; if(f) handleFileUpload({target:{files:[f]}});
+});
+
+// ── ADD SINGLE Q ──
+window.addSingleQuestion = async function(){
+  const q=document.getElementById('newQ').value.trim();
+  const opts=[0,1,2,3].map(i=>document.getElementById(`opt${i}`).value.trim());
+  const ans=parseInt(document.getElementById('newAns').value);
+  const cat=document.getElementById('newCat').value.trim()||'💡 معلومات عامة';
+  if(!q||opts.some(o=>!o)){ toast('❌ أكمل جميع الحقول'); return; }
+  try {
+    await addDoc(collection(db,'questions'),{q,opts,ans,cat,order:allQuestions.length});
+    toast('✅ تمت الإضافة');
+    document.getElementById('newQ').value='';
+    [0,1,2,3].forEach(i=>document.getElementById(`opt${i}`).value='');
+    await loadQuestionsAdmin();
+  } catch(e){ toast('❌ فشلت الإضافة'); }
+};
+
+// ── DELETE Q ──
+window.deleteQ = async function(id){
+  if(!confirm('حذف هذا السؤال؟')) return;
+  try {
+    await deleteDoc(doc(db,'questions',id));
+    toast('🗑 تم الحذف');
+    await loadQuestionsAdmin();
+  } catch(e){ toast('❌ فشل الحذف'); }
+};
+
+// ── ADMIN TABS ──
+window.adminTab = function(tab){
+  document.querySelectorAll('.a-tab').forEach((b,i)=>b.classList.toggle('active',(tab==='questions'&&i===0)||(tab==='history'&&i===1)));
+  document.getElementById('panel-questions').classList.toggle('active',tab==='questions');
+  document.getElementById('panel-history').classList.toggle('active',tab==='history');
+  if(tab==='history') loadAdminHistory();
+};
+
+async function loadAdminHistory(){
+  const list=document.getElementById('adminHistList');
+  list.innerHTML='<div class="empty-msg">⏳ جاري التحميل...</div>';
+  try {
+    const snap=await getDocs(query(collection(db,'games'),orderBy('date','desc')));
+    if(snap.empty){list.innerHTML='<div class="empty-msg">لا توجد جولات بعد</div>';return}
+    list.innerHTML='';
+    snap.forEach(d=>{
+      const g=d.data();
+      const date=g.date?.toDate?g.date.toDate().toLocaleDateString('ar-SA',{day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'}):'—';
+      const div=document.createElement('div'); div.className='hist-card';
+      div.innerHTML=`
+        <div class="hist-info">
+          <div class="hist-date">📅 ${date} • بواسطة: ${g.createdBy||'—'}</div>
+          <div class="hist-teams">${g.team1?.name||'؟'} ضد ${g.team2?.name||'؟'}</div>
+          <div style="font-size:.78rem;color:var(--dim);margin-top:3px">🎯 ${g.questionsPlayed||0} سؤال</div>
+        </div>
+        <div class="hist-scores">
+          <div class="hs t1c"><div class="hs-name">${g.team1?.name||''}</div><div class="hs-pts">${g.team1?.score??0}</div></div>
+          <div class="hs t2c"><div class="hs-name">${g.team2?.name||''}</div><div class="hs-pts">${g.team2?.score??0}</div></div>
+        </div>
+        <div class="winner-tag">${g.winner==='تعادل'?'🤝 تعادل':'🏆 '+g.winner}</div>`;
+      list.appendChild(div);
+    });
+  } catch(e){ list.innerHTML='<div class="empty-msg">⚠️ تعذّر التحميل</div>'; }
+}
+
+// ── ADD MEMBER ──
+window.addMem = function(team){
+  const c=document.getElementById(`t${team}mems`);
+  const n=c.querySelectorAll('.member-row').length+1;
+  const d=document.createElement('div'); d.className='member-row';
+  d.innerHTML=`<span class="mem-num">${n}</span><input class="inp" type="text" placeholder="اسم العضو ${n}" dir="rtl" style="margin:0">`;
+  c.appendChild(d);
+};
+
+// ── START GAME ──
+window.startGame = function(){
+  if(!allQuestions.length){ toast('⚠️ لا توجد أسئلة — تواصل مع المدير'); return; }
+  const t1n=document.getElementById('t1name').value.trim()||'الفريق الأول';
+  const t2n=document.getElementById('t2name').value.trim()||'الفريق الثاني';
+  const t1m=[...document.querySelectorAll('#t1mems input')].map(i=>i.value.trim()).filter(Boolean);
+  const t2m=[...document.querySelectorAll('#t2mems input')].map(i=>i.value.trim()).filter(Boolean);
+  S.t1={name:t1n,members:t1m,score:0};
+  S.t2={name:t2n,members:t2m,score:0};
+  S.questions=shuffle(allQuestions);
+  S.current=0; S.answered=false;
+  document.getElementById('t1label').textContent=t1n;
+  document.getElementById('t2label').textContent=t2n;
+  document.getElementById('t1mlist').textContent=t1m.join(' • ');
+  document.getElementById('t2mlist').textContent=t2m.join(' • ');
+  document.getElementById('s1btn').textContent=`+2 ${t1n}`;
+  document.getElementById('s2btn').textContent=`+2 ${t2n}`;
+  document.getElementById('qTotal').textContent=S.questions.length;
+  ss('game'); loadQ();
+};
+
+// ── GAME ──
+function loadQ(){
+  if(S.current>=S.questions.length){endGame();return}
+  const q=S.questions[S.current]; S.answered=false;
+  document.getElementById('qNum').textContent=S.current+1;
+  document.getElementById('catBadge').textContent=q.cat||'📚';
+  document.getElementById('questionText').textContent=q.q;
+  const grid=document.getElementById('optionsGrid'); grid.innerHTML='';
+  ['أ','ب','ج','د'].forEach((l,i)=>{
+    const btn=document.createElement('button'); btn.className='opt-btn';
+    btn.innerHTML=`<span class="opt-let">${l}</span><span>${q.opts[i]}</span>`;
+    btn.onclick=()=>reveal(i,q.ans,q);
+    grid.appendChild(btn);
+  });
+  startTimer(); updateSc();
+}
+
+function reveal(chosen,correct,q){
+  if(S.answered)return; S.answered=true; stopTimer();
+  document.querySelectorAll('.opt-btn').forEach((b,i)=>{
+    b.disabled=true;
+    if(i===correct)b.classList.add('correct');
+    else if(i===chosen&&chosen!==correct)b.classList.add('wrong');
+  });
+  if(chosen===correct) showReveal('✅','إجابة صحيحة! 🎉',`الجواب: ${q.opts[correct]}`);
+  else showReveal('❌','إجابة خاطئة!',`الجواب الصحيح: ${q.opts[correct]}`);
+}
+
+function showReveal(e,t,s){
+  document.getElementById('revealEmoji').textContent=e;
+  document.getElementById('revealText').textContent=t;
+  document.getElementById('revealAns').textContent=s;
+  const ov=document.getElementById('revealOverlay');
+  ov.classList.add('show'); setTimeout(()=>ov.classList.remove('show'),2200);
+}
+
+window.givePoint=function(team){
+  if(team===1)S.t1.score+=2; else S.t2.score+=2;
+  updateSc();
+  const el=document.getElementById(`t${team}pts`);
+  el.style.transform='scale(1.4)'; setTimeout(()=>el.style.transform='scale(1)',280);
+  toast(`+2 لـ ${team===1?S.t1.name:S.t2.name} 🎯`);
+};
+
+function updateSc(){
+  document.getElementById('t1pts').textContent=S.t1.score;
+  document.getElementById('t2pts').textContent=S.t2.score;
+}
+
+window.nextQ=function(){S.current++;loadQ()};
+window.confirmEnd=function(){if(confirm('إنهاء اللعبة الآن؟'))endGame()};
+
+// ── TIMER ──
+const CIRC=2*Math.PI*21;
+function startTimer(){
+  stopTimer(); S.timeLeft=15; updateTimerUI();
+  S.timerInterval=setInterval(()=>{
+    S.timeLeft--; updateTimerUI();
+    if(S.timeLeft<=0){
+      stopTimer();
+      if(!S.answered){
+        S.answered=true;
+        const q=S.questions[S.current];
+        document.querySelectorAll('.opt-btn').forEach((b,i)=>{b.disabled=true;if(i===q.ans)b.classList.add('correct')});
+        showReveal('⏰','انتهى الوقت!',`الجواب: ${q.opts[q.ans]}`);
+      }
+    }
+  },1000);
+}
+function stopTimer(){clearInterval(S.timerInterval)}
+function updateTimerUI(){
+  const p=S.timeLeft/15;
+  document.getElementById('timerCircle').style.strokeDashoffset=CIRC*(1-p);
+  document.getElementById('timerNum').textContent=S.timeLeft;
+  const c=S.timeLeft<=5?'#ff1744':S.timeLeft<=10?'#ff6d00':'#ffd700';
+  document.getElementById('timerCircle').style.stroke=c;
+  document.getElementById('timerNum').style.color=c;
+}
+
+// ── END GAME ──
+async function endGame(){
+  stopTimer(); ss('final');
+  const s1=S.t1.score,s2=S.t2.score;
+  let winner='تعادل';
+  if(s1>s2){document.getElementById('winTrophy').textContent='🏆';document.getElementById('winTitle').textContent=`الفائز: ${S.t1.name}`;winner=S.t1.name}
+  else if(s2>s1){document.getElementById('winTrophy').textContent='🏆';document.getElementById('winTitle').textContent=`الفائز: ${S.t2.name}`;winner=S.t2.name}
+  else{document.getElementById('winTrophy').textContent='🤝';document.getElementById('winTitle').textContent='تعادل مثير!'}
+  document.getElementById('winSub').textContent='أحسنتم جميعاً! 🌟';
+  document.getElementById('finalScores').innerHTML=`
+    <div class="final-card fc1 ${s1>=s2?'winner-card':'loser-card'}">
+      <div class="fc-name">${S.t1.name}</div><div class="fc-pts">${s1}</div><div class="fc-lbl">نقطة</div>
+    </div>
+    <div class="final-card fc2 ${s2>=s1?'winner-card':'loser-card'}">
+      <div class="fc-name">${S.t2.name}</div><div class="fc-pts">${s2}</div><div class="fc-lbl">نقطة</div>
+    </div>`;
+  launchConfetti();
+  document.getElementById('savingMsg').textContent='💾 جاري الحفظ...';
+  try {
+    await addDoc(collection(db,'games'),{
+      date:serverTimestamp(), createdBy:currentPlayer||'لاعب',
+      team1:{name:S.t1.name,members:S.t1.members,score:s1},
+      team2:{name:S.t2.name,members:S.t2.members,score:s2},
+      winner, questionsPlayed:S.current,
+    });
+    document.getElementById('savingMsg').textContent='✅ تم الحفظ!';
+  } catch(e){ document.getElementById('savingMsg').textContent='⚠️ تعذّر الحفظ'; }
+}
+
+window.goHome=function(){
+  document.getElementById('confettiEl').innerHTML='';
+  if(currentRole==='admin') ss('admin');
+  else { loadQuestionsForGame(); ss('home'); }
+};
+
+function launchConfetti(){
+  const c=document.getElementById('confettiEl');
+  const cols=['#ffd700','#e91e8c','#00bcd4','#ff6d00','#7c4dff','#00e676','#fff'];
+  for(let i=0;i<120;i++){
+    setTimeout(()=>{
+      const p=document.createElement('div'); p.className='confetti-piece';
+      p.style.cssText=`left:${Math.random()*100}%;background:${cols[~~(Math.random()*cols.length)]};width:${6+Math.random()*8}px;height:${10+Math.random()*10}px;border-radius:${Math.random()>.5?'50%':'2px'};animation:fall ${2+Math.random()*3}s linear forwards;`;
+      c.appendChild(p); setTimeout(()=>p.remove(),5000);
+    },Math.random()*2000);
+  }
+}
+
+// ── INIT ──
+async function init(){
+  try {
+    await getDocs(collection(db,'questions'));
+  } catch(e){}
+  ss('login');
+}
+init();
+</script>
+</body>
+</html>
