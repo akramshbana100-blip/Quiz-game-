@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>لعبة الأسئلة 🏆</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⭐</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;800;900&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -487,6 +488,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
   <div id="panel-history" class="a-panel">
     <div class="panel-header">
       <h2>📊 سجل الجولات</h2>
+      <button onclick="deleteAllHistory()" style="background:rgba(255,23,68,.12);border:1.5px solid var(--wrong);border-radius:8px;padding:7px 16px;font-family:'Tajawal',sans-serif;font-size:.85rem;font-weight:700;color:var(--wrong);cursor:pointer">🗑 حذف الكل</button>
     </div>
     <div id="adminHistList"><div class="empty-msg">⏳ جاري التحميل...</div></div>
   </div>
@@ -833,7 +835,7 @@ async function loadAdminHistory(){
     if(snap.empty){list.innerHTML='<div class="empty-msg">لا توجد جولات بعد</div>';return}
     list.innerHTML='';
     snap.forEach(d=>{
-      const g=d.data();
+      const g=d.data(); const gid=d.id;
       const date=g.date?.toDate?g.date.toDate().toLocaleDateString('ar-SA',{day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'}):'—';
       const div=document.createElement('div'); div.className='hist-card';
       div.innerHTML=`
@@ -846,11 +848,35 @@ async function loadAdminHistory(){
           <div class="hs t1c"><div class="hs-name">${g.team1?.name||''}</div><div class="hs-pts">${g.team1?.score??0}</div></div>
           <div class="hs t2c"><div class="hs-name">${g.team2?.name||''}</div><div class="hs-pts">${g.team2?.score??0}</div></div>
         </div>
-        <div class="winner-tag">${g.winner==='تعادل'?'🤝 تعادل':'🏆 '+g.winner}</div>`;
+        <div style="display:flex;flex-direction:column;gap:6px;align-items:center">
+          <div class="winner-tag">${g.winner==='تعادل'?'🤝 تعادل':'🏆 '+g.winner}</div>
+          <button class="q-del" onclick="deleteGame('${gid}')">🗑 حذف</button>
+        </div>`;
       list.appendChild(div);
     });
   } catch(e){ list.innerHTML='<div class="empty-msg">⚠️ تعذّر التحميل</div>'; }
 }
+
+window.deleteGame = async function(id){
+  if(!confirm('حذف هذه المباراة؟')) return;
+  try {
+    await deleteDoc(doc(db,'games',id));
+    toast('🗑 تم الحذف');
+    await loadAdminHistory();
+  } catch(e){ toast('❌ فشل الحذف'); }
+};
+
+window.deleteAllHistory = async function(){
+  if(!confirm('حذف كل السجل نهائياً؟')) return;
+  try {
+    const snap=await getDocs(collection(db,'games'));
+    const batch=writeBatch(db);
+    snap.forEach(d=>batch.delete(d.ref));
+    await batch.commit();
+    toast('🗑 تم حذف كل السجل');
+    await loadAdminHistory();
+  } catch(e){ toast('❌ فشل الحذف'); }
+};
 
 // ── ADD MEMBER ──
 window.addMem = function(team){
