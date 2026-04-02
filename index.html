@@ -864,23 +864,14 @@
             <h2>⚙️ إعدادات اللعبة الفردية</h2>
         </div>
 
-        <div class="question-container" style="max-width: 500px;">
-            <div class="form-group">
-                <label>عدد الأسئلة:</label>
-                <input type="number" id="questionCount" min="1" max="50" value="10" style="width: 100%; padding: 12px; border: 2px solid var(--border); border-radius: 8px;">
+        <div class="question-container" style="max-width: 500px; text-align: center;">
+            <div style="margin: 40px 0;">
+                <h3 style="color: var(--primary); margin-bottom: 20px; font-size: 1.3rem;">🎮 اضغط للبدء</h3>
+                <p style="color: #64748b; margin-bottom: 20px;">سيتم توليد 10 أسئلة بمستوى متوسط</p>
             </div>
 
-            <div class="form-group">
-                <label>مستوى الصعوبة:</label>
-                <div class="difficulty-select">
-                    <button class="difficulty-btn active" type="button" onclick="app.setDifficulty('سهل')">سهل</button>
-                    <button class="difficulty-btn" type="button" onclick="app.setDifficulty('متوسط')">متوسط</button>
-                    <button class="difficulty-btn" type="button" onclick="app.setDifficulty('صعب')">صعب</button>
-                </div>
-            </div>
-
-            <button class="btn btn-primary" type="button" style="width: 100%; margin-top: 20px;" onclick="app.playSound('click'); app.startSinglePlayerGame()">
-                <span id="generateBtnText">🎮 توليد الأسئلة والبدء</span>
+            <button class="btn btn-primary" type="button" style="width: 100%; padding: 15px; font-size: 1.1rem;" onclick="app.playSound('click'); app.startSinglePlayerGame()">
+                <span id="generateBtnText">🎮 ابدأ اللعبة الآن</span>
             </button>
         </div>
     </div>
@@ -930,17 +921,8 @@
             </div>
 
             <div class="admin-section">
-                <label>عدد الأسئلة:</label>
-                <input type="number" id="teamQuestionCount" min="1" max="50" value="10" style="width: 100%; padding: 12px; margin-bottom: 15px; border: 2px solid var(--border); border-radius: 8px;">
-                
-                <label>مستوى الصعوبة:</label>
-                <div class="difficulty-select">
-                    <button class="difficulty-btn active" type="button" onclick="app.setTeamDifficulty('سهل')">سهل</button>
-                    <button class="difficulty-btn" type="button" onclick="app.setTeamDifficulty('متوسط')">متوسط</button>
-                    <button class="difficulty-btn" type="button" onclick="app.setTeamDifficulty('صعب')">صعب</button>
-                </div>
-
-                <button class="btn btn-primary" type="button" style="width: 100%; margin-top: 20px;" onclick="app.playSound('click'); app.startTeamGame()">🎮 توليد الأسئلة والبدء</button>
+                <p style="color: #64748b; text-align: center; margin: 20px 0;">سيتم توليد 10 أسئلة بمستوى متوسط</p>
+                <button class="btn btn-primary" type="button" style="width: 100%; padding: 12px; font-size: 1rem;" onclick="app.playSound('click'); app.startTeamGame()">🎮 ابدأ اللعبة</button>
             </div>
         </div>
     </div>
@@ -1389,14 +1371,14 @@
                     return;
                 }
 
-                const count = parseInt(document.getElementById('questionCount').value) || 10;
+                const count = 10; // عدد ثابت
                 
                 const btn = document.querySelector('#singlePlayerSetup .btn-primary');
                 btn.disabled = true;
                 const originalText = btn.innerHTML;
                 btn.innerHTML = '<div class="loading-spinner"></div> جاري التوليد...';
 
-                this.questions = await this.generateQuestionsWithGroq(this.selectedCategory, count, this.difficulty);
+                this.questions = await this.generateQuestionsWithGroq(this.selectedCategory, count, 'متوسط');
                 
                 btn.disabled = false;
                 btn.innerHTML = originalText;
@@ -1423,14 +1405,14 @@
                     return;
                 }
 
-                const count = parseInt(document.getElementById('teamQuestionCount').value) || 10;
+                const count = 10; // عدد ثابت
 
                 const btn = document.querySelector('#teamGameSetup .btn-primary');
                 btn.disabled = true;
                 const originalText = btn.innerHTML;
                 btn.innerHTML = '<div class="loading-spinner"></div> جاري التوليد...';
 
-                this.questions = await this.generateQuestionsWithGroq(this.selectedCategory, count, this.teamDifficulty);
+                this.questions = await this.generateQuestionsWithGroq(this.selectedCategory, count, 'متوسط');
                 
                 btn.disabled = false;
                 btn.innerHTML = originalText;
