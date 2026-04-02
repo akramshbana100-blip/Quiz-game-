@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#FF6B9D">
+    <title>QuizMaster 🎯 | نظام الأسئلة الذكي</title>
+    
+    <!-- Favicon ديناميكي -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,
+    <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>
+        <defs>
+            <style>
+                @keyframes glow {
+                    0%, 100% { filter: drop-shadow(0 0 8px %23FF6B9D); }
+                    50% { filter: drop-shadow(0 0 15px %239D6BFF); }
+                }
+                .brain { animation: glow 2s infinite; }
+            </style>
+        </defs>
+        <circle cx='50' cy='50' r='45' fill='%23FF6B9D' opacity='0.1'/>
+        <g class='brain' transform='translate(50, 50)'>
+            <circle cx='-15' cy='-10' r='10' fill='%23FF6B9D'/>
+            <circle cx='15' cy='-10' r='10' fill='%239D6BFF'/>
+            <circle cx='-8' cy='8' r='8' fill='%2300D9FF'/>
+            <circle cx='8' cy='8' r='8' fill='%23FFD700'/>
+        </g>
+    </svg>">
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- خلفية متحركة -->
+    <div class="mesh-gradient"></div>
+    
+    <!-- حاوية رئيسية -->
+    <div class="container">
+        <!-- شريط الرأس -->
+        <header class="header">
+            <div class="logo-section">
+                <div class="logo-icon">🧠</div>
+                <h1>QuizMaster</h1>
+            </div>
+            <button id="settingsBtn" class="settings-btn" title="الإعدادات">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path d="M12 1v6m0 6v6m4.22-15.22l-4.24 4.24m0 5.96l4.24 4.24M20 12h-6m-6 0H2m15.22 4.22l-4.24-4.24m-5.96 0l-4.24 4.24"></path>
+                </svg>
+            </button>
+        </header>
+
+        <!-- المحتوى الرئيسي -->
+        <main class="main-content">
+            
+            <!-- شاشة البداية -->
+            <section id="homeScreen" class="screen active">
+                <div class="home-card">
+                    <div class="icon-large">🎯</div>
+                    <h2>أهلاً بك في QuizMaster</h2>
+                    <p>اختبر معلوماتك وتنافس مع الآخرين!</p>
+                    
+                    <div class="category-grid">
+                        <button class="category-btn" data-category="عام">
+                            <span class="cat-icon">🌍</span>
+                            <span>عام</span>
+                        </button>
+                        <button class="category-btn" data-category="علوم">
+                            <span class="cat-icon">🔬</span>
+                            <span>علوم</span>
+                        </button>
+                        <button class="category-btn" data-category="تكنولوجيا">
+                            <span class="cat-icon">💻</span>
+                            <span>تكنولوجيا</span>
+                        </button>
+                        <button class="category-btn" data-category="ثقافة">
+                            <span class="cat-icon">📚</span>
+                            <span>ثقافة</span>
+                        </button>
+                    </div>
+                    
+                    <div class="input-group">
+                        <input type="text" id="playerName" placeholder="أدخل اسمك" maxlength="20">
+                        <button id="startBtn" class="btn-primary">ابدأ اللعبة</button>
+                    </div>
+                    
+                    <button id="leaderboardBtn" class="btn-secondary">
+                        <span>🏆</span> لوحة الصدارة
+                    </button>
+                </div>
+            </section>
+
+            <!-- شاشة اللعبة -->
+            <section id="gameScreen" class="screen">
+                <div class="game-container">
+                    <!-- شريط المعلومات العلوي -->
+                    <div class="game-header">
+                        <div class="game-info">
+                            <div class="info-item">
+                                <span class="label">السؤال</span>
+                                <span class="value" id="questionNumber">1/10</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="label">النقاط</span>
+                                <span class="value" id="scoreDisplay">0</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="label">الوقت</span>
+                                <span class="value" id="timer">30</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- مؤشر التقدم -->
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+
+                    <!-- منطقة السؤال -->
+                    <div class="question-section">
+                        <h2 id="questionText">جاري التحميل...</h2>
+                        <p id="categoryTag" class="category-tag"></p>
+                    </div>
+
+                    <!-- أيقونات الأدوات المساعدة -->
+                    <div class="lifelines">
+                        <button class="lifeline-btn" id="lifeline50" title="حذف إجابتين (50:50)">
+                            <span class="lifeline-icon">✂️</span>
+                            <span class="lifeline-label">50:50</span>
+                        </button>
+                        <button class="lifeline-btn" id="lifelinePause" title="تجميد الوقت (10 ثوانٍ)">
+                            <span class="lifeline-icon">⏸️</span>
+                            <span class="lifeline-label">توقف</span>
+                        </button>
+                        <button class="lifeline-btn" id="lifelineSwap" title="تغيير السؤال">
+                            <span class="lifeline-icon">🔄</span>
+                            <span class="lifeline-label">تغيير</span>
+                        </button>
+                    </div>
+
+                    <!-- خيارات الإجابة -->
+                    <div class="options-grid" id="optionsGrid">
+                        <!-- سيتم ملؤها بـ JavaScript -->
+                    </div>
+
+                    <!-- زر التعادل/القائمة -->
+                    <div class="game-actions">
+                        <button id="quitBtn" class="btn-quit">خروج</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- شاشة النتيجة -->
+            <section id="resultScreen" class="screen">
+                <div class="result-card">
+                    <div class="result-badge" id="resultBadge">✨</div>
+                    <h2 id="resultTitle">ممتاز!</h2>
+                    <p id="resultMessage">أداء رائع جداً</p>
+                    
+                    <div class="result-stats">
+                        <div class="stat">
+                            <span class="stat-label">النقاط النهائية</span>
+                            <span class="stat-value" id="finalScore">0</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-label">الإجابات الصحيحة</span>
+                            <span class="stat-value" id="correctAnswers">0/10</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-label">متوسط الوقت</span>
+                            <span class="stat-value" id="avgTime">0s</span>
+                        </div>
+                    </div>
+
+                    <div class="result-actions">
+                        <button id="retryBtn" class="btn-primary">حاول مرة أخرى</button>
+                        <button id="homeBtn" class="btn-secondary">العودة للرئيسية</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- شاشة لوحة الصدارة -->
+            <section id="leaderboardScreen" class="screen">
+                <div class="leaderboard-card">
+                    <h2>🏆 لوحة الصدارة</h2>
+                    <div class="leaderboard-list" id="leaderboardList">
+                        <p class="loading">جاري التحميل...</p>
+                    </div>
+                    <button id="backBtn" class="btn-primary">رجوع</button>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- نافذة الإعدادات -->
+    <div id="settingsModal" class="modal">
+        <div class="modal-content settings-modal">
+            <button class="close-btn">&times;</button>
+            <h2>⚙️ الإعدادات</h2>
+            
+            <div class="settings-section">
+                <label>مستوى الصوت</label>
+                <div class="volume-control">
+                    <input type="range" id="volumeSlider" min="0" max="100" value="70">
+                    <span id="volumeValue">70%</span>
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <label>
+                    <input type="checkbox" id="musicToggle" checked>
+                    تشغيل الموسيقى الخلفية
+                </label>
+            </div>
+
+            <div class="settings-section">
+                <label>
+                    <input type="checkbox" id="soundEffectsToggle" checked>
+                    تشغيل المؤثرات الصوتية
+                </label>
+            </div>
+
+            <div class="settings-section">
+                <label>كلمة سر المدير (اختياري)</label>
+                <input type="password" id="adminPassword" placeholder="أدخل كلمة السر">
+            </div>
+
+            <div class="settings-actions">
+                <button id="clearDataBtn" class="btn-secondary">مسح البيانات</button>
+                <button id="closeSettingsBtn" class="btn-primary">إغلاق</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- نافذة التحميل -->
+    <div id="loadingSpinner" class="loading-spinner">
+        <div class="spinner"></div>
+        <p>جاري التحميل...</p>
+    </div>
+
+    <!-- Toast إشعارات -->
+    <div id="toast" class="toast"></div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js"></script>
+
+    <!-- Audio Elements -->
+    <audio id="bgMusic" loop preload="auto"></audio>
+    <audio id="clickSound" preload="auto"></audio>
+    <audio id="correctSound" preload="auto"></audio>
+    <audio id="wrongSound" preload="auto"></audio>
+    <audio id="winSound" preload="auto"></audio>
+
+    <script src="script.js"></script>
+</body>
+</html>
