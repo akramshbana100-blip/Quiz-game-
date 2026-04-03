@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quizeria Pro - منصة الاختبارات الذكية</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- MAIN MENU -->
+<div id="mainMenu" class="screen active">
+    <div class="setup-box">
+        <h1>🎮 QUIZERIA 🎮</h1>
+        <p style="text-align: center; color: var(--dim); margin-bottom: 30px;">منصة الألعاب الثقافية الذكية</p>
+        
+        <div class="field" style="margin-bottom: 20px;">
+            <button class="btn btn-play" onclick="app.startSetup()">🎮 العب الآن</button>
+        </div>
+        
+        <div class="field">
+            <button class="btn btn-admin" onclick="app.openAdminPanel()">⚙️ لوحة التحكم</button>
+        </div>
+    </div>
+</div>
+
+<!-- ADMIN PANEL SCREEN -->
+<div id="adminPanel" class="screen">
+    <div class="admin-container">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+            <h1>⚙️ لوحة التحكم</h1>
+            <button class="btn btn-back" onclick="app.backToMenu()">🔙 رجوع</button>
+        </div>
+
+        <!-- Password Verification -->
+        <div id="passwordVerification" class="admin-section">
+            <div style="text-align: center;">
+                <p style="color: var(--dim); margin-bottom: 20px;">أدخل كلمة السر للدخول لوحة التحكم</p>
+                <input type="password" id="adminPassword" class="inp" placeholder="أدخل كلمة السر" onkeypress="if(event.key==='Enter') app.verifyAdminPassword()">
+                <div style="margin-top: 15px;">
+                    <button class="btn btn-play" onclick="app.verifyAdminPassword()">تحقق</button>
+                </div>
+                <p style="color: var(--wrong); margin-top: 10px; font-size: 0.9rem;" id="passwordError"></p>
+            </div>
+        </div>
+
+        <!-- Admin Controls (Hidden by default) -->
+        <div id="adminControls" style="display: none;">
+            <!-- Categories Management -->
+            <div class="admin-section">
+                <h2>📁 إدارة الفئات</h2>
+                <div style="margin-bottom: 15px;">
+                    <input type="text" id="categoryName" class="inp" placeholder="اسم الفئة الجديدة">
+                    <button class="btn btn-play" onclick="app.addCategory()" style="margin-top: 10px; width: 100%;">➕ إضافة فئة</button>
+                </div>
+                
+                <div id="categoriesListAdmin" class="admin-list">
+                    <!-- Categories will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Questions Management -->
+            <div class="admin-section">
+                <h2>📝 إدارة الأسئلة</h2>
+                
+                <div class="field">
+                    <label class="label">اختر الفئة:</label>
+                    <select id="categorySelect" class="inp">
+                        <option value="">-- اختر فئة --</option>
+                    </select>
+                </div>
+
+                <div class="field">
+                    <label class="label">السؤال:</label>
+                    <textarea id="questionText" class="inp" placeholder="أدخل نص السؤال" rows="3" style="resize: vertical;"></textarea>
+                </div>
+
+                <div class="field">
+                    <label class="label">الخيار الأول (الصحيح):</label>
+                    <input type="text" id="optionA" class="inp" placeholder="الإجابة الصحيحة">
+                </div>
+
+                <div class="field">
+                    <label class="label">الخيار الثاني:</label>
+                    <input type="text" id="optionB" class="inp" placeholder="">
+                </div>
+
+                <div class="field">
+                    <label class="label">الخيار الثالث:</label>
+                    <input type="text" id="optionC" class="inp" placeholder="">
+                </div>
+
+                <div class="field">
+                    <label class="label">الخيار الرابع:</label>
+                    <input type="text" id="optionD" class="inp" placeholder="">
+                </div>
+
+                <div class="field">
+                    <label class="label">مستوى الصعوبة:</label>
+                    <select id="difficulty" class="inp">
+                        <option value="easy">سهل 🟢</option>
+                        <option value="medium" selected>متوسط 🟡</option>
+                        <option value="hard">صعب 🔴</option>
+                    </select>
+                </div>
+
+                <button class="btn btn-play" onclick="app.addQuestion()" style="width: 100%; margin-top: 15px;">➕ إضافة سؤال</button>
+
+                <hr style="margin: 30px 0; border: 1px solid rgba(255,255,255,.1);">
+
+                <h3 style="margin-bottom: 15px;">📋 الأسئلة المضافة</h3>
+                <div id="questionsListAdmin" class="admin-list">
+                    <!-- Questions will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SETUP SCREEN -->
+<div id="setup" class="screen">
+    <div class="setup-box">
+        <h1>🏆 إعدادات اللعبة</h1>
+        
+        <div class="field">
+            <label class="label">اسم الفريق الأول:</label>
+            <input type="text" id="team1Name" class="inp" placeholder="ابدأ بكتابة اسم الفريق..." value="الفريق الأول">
+        </div>
+        
+        <div class="field">
+            <label class="label">اسم الفريق الثاني:</label>
+            <input type="text" id="team2Name" class="inp" placeholder="ابدأ بكتابة اسم الفريق..." value="الفريق الثاني">
+        </div>
+
+        <div class="field">
+            <label class="label">عدد أعضاء كل فريق:</label>
+            <input type="number" id="teamSize" class="inp" placeholder="مثال: 5" value="3" min="1" max="10">
+        </div>
+
+        <div class="field">
+            <label class="label">اختر الفئة:</label>
+            <select id="categoryGameSelect" class="inp">
+                <option value="">-- اختر فئة --</option>
+            </select>
+        </div>
+
+        <div class="field">
+            <label class="label">عدد الأسئلة:</label>
+            <input type="number" id="questionCount" class="inp" placeholder="مثال: 10" value="5" min="1" max="50">
+        </div>
+
+        <div class="difficulty-selector">
+            <button class="diff-btn active" data-level="easy">سهل 🟢</button>
+            <button class="diff-btn" data-level="medium">متوسط 🟡</button>
+            <button class="diff-btn" data-level="hard">صعب 🔴</button>
+        </div>
+
+        <button class="btn btn-play" onclick="app.startGame()" style="width: 100%; margin-top: 20px;">▶️ ابدأ اللعبة</button>
+        <button class="btn btn-secondary" onclick="app.backToMenu()" style="width: 100%; margin-top: 10px;">🔙 رجوع</button>
+    </div>
+</div>
+
+<!-- GAME SCREEN -->
+<div id="game" class="screen">
+    <div class="game-header">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <h2>🎮 جارية اللعبة</h2>
+            <button class="btn btn-back" onclick="app.exitGame()">🔙 رجوع</button>
+        </div>
+        
+        <div class="scores-container">
+            <div class="score-card team1">
+                <div class="team-name" id="team1NameDisplay"></div>
+                <div class="score-value" id="team1Score">0</div>
+                <div class="current-player" id="team1CurrentPlayer"></div>
+            </div>
+            <div class="score-card team2">
+                <div class="team-name" id="team2NameDisplay"></div>
+                <div class="score-value" id="team2Score">0</div>
+                <div class="current-player" id="team2CurrentPlayer"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="game-content">
+        <div class="question-box">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <span style="color: var(--dim); font-size: 0.9rem;">السؤال <span id="qNum">1</span> من <span id="qTotal">10</span></span>
+                <span class="difficulty-badge" id="diffBadge">سهل 🟢</span>
+            </div>
+            <h3 id="questionText"></h3>
+            <div class="options" id="optionsContainer"></div>
+        </div>
+    </div>
+
+    <div class="action-buttons">
+        <button class="btn btn-primary" id="passBtn" onclick="app.passQuestion()">⏭️ تمرير</button>
+        <button class="btn btn-primary" id="nextBtn" onclick="app.nextQuestion()" style="display: none;">➡️ السؤال التالي</button>
+    </div>
+</div>
+
+<!-- RESULT SCREEN -->
+<div id="result" class="screen">
+    <div class="result-box">
+        <div class="result-title" id="resultTitle">🎉 الفريق الأول فاز!</div>
+        <div class="result-text" id="resultText">النتيجة النهائية</div>
+        
+        <div class="final-scores">
+            <div class="final-score">
+                <div class="team-name" id="finalTeam1Name">الفريق الأول</div>
+                <div class="score" id="finalTeam1Score">0</div>
+            </div>
+            <div class="final-score">
+                <div class="team-name" id="finalTeam2Name">الفريق الثاني</div>
+                <div class="score" id="finalTeam2Score">0</div>
+            </div>
+        </div>
+
+        <button class="btn btn-play" onclick="app.backToMenu()" style="width: 100%;">🏠 العودة للقائمة الرئيسية</button>
+    </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
