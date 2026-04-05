@@ -1,0 +1,218 @@
+```html
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>كويزيريا برو | Quizeria Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap');
+        body { font-family: 'Tajawal', sans-serif; background-color: #020617; color: white; margin: 0; overflow-x: hidden; }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+        .animate-float { animation: float 3s ease-in-out infinite; }
+        .glass { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+        // --- إعدادات Firebase الخاصة بك ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyBxP0Z51YcIrR2XEAOPvARdZ8Hk7AeuCvY",
+            authDomain: "quizarea-29872.firebaseapp.com",
+            projectId: "quizarea-29872",
+            storageBucket: "quizarea-29872.firebasestorage.app",
+            messagingSenderId: "118767307298",
+            appId: "1:118767307298:web:26ed0ffd17cc8cc576587b"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+        
+        // تصدير الأدوات للنافذة لتستخدمها React
+        window.db = db;
+        window.auth = auth;
+        window.fbUtils = { collection, addDoc, onSnapshot, query, orderBy };
+    </script>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+        const GEMINI_API_KEY = "AIzaSyBmpHsmnZxkcM66aTOtOLWtYUH0egxgtYk";
+        const appId = "quizarea-29872";
+
+        const CATEGORIES = [
+            { name: "علوم حياتية", emoji: "🧬", color: "from-green-500 to-emerald-700" },
+            { name: "تكنولوجيا", emoji: "💻", color: "from-blue-500 to-indigo-700" },
+            { name: "لغة عربية", emoji: "📚", color: "from-amber-500 to-orange-700" },
+            { name: "ثقافة عامة", emoji: "🌍", color: "from-purple-500 to-pink-700" }
+        ];
+
+        function App() {
+            const [view, setView] = useState('home');
+            const [loading, setLoading] = useState(true);
+
+            useEffect(() => {
+                const checkAuth = setInterval(() => {
+                    if (window.auth) {
+                        signInAnonymously(window.auth).then(() => setLoading(false));
+                        clearInterval(checkAuth);
+                    }
+                }, 500);
+            }, []);
+
+            if (loading) return (
+                <div className="min-h-screen flex flex-col items-center justify-center">
+                    <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                    <p className="mt-4 text-slate-400">جاري التحميل...</p>
+                </div>
+            );
+
+            return (
+                <div className="min-h-screen relative">
+                    <div className="fixed inset-0 bg-[radial-gradient(circle_at_50%_50%,#111827_0%,#020617_100%)] -z-10" />
+                    {view === 'home' && <Home setView={setView} />}
+                    {view === 'admin' && <AdminPanel setView={setView} />}
+                    {view === 'player' && <PlayerMode setView={setView} />}
+                </div>
+            );
+        }
+
+        function Home({ setView }) {
+            return (
+                <div className="flex flex-col items-center justify-center min-h-screen p-6">
+                    <div className="text-9xl mb-6 animate-float">⚡</div>
+                    <h1 className="text-6xl font-black mb-4 bg-clip-text text-transparent bg-gradient-to-b from-white to-slate-500">كويزيريا برو</h1>
+                    <p className="text-slate-400 mb-12 text-xl">تحديات ذكية بلمسة إيموجي 🎨</p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 w-full max-w-2xl">
+                        <button onClick={() => setView('player')} className="glass p-10 rounded-[3rem] hover:scale-105 transition-all text-center">
+                            <span className="text-7xl block mb-2">🎮</span>
+                            <span className="text-2xl font-bold">بدء اللعب</span>
+                        </button>
+                        <button onClick={() => setView('admin')} className="glass p-10 rounded-[3rem] hover:scale-105 transition-all text-center">
+                            <span className="text-7xl block mb-2">🔐</span>
+                            <span className="text-2xl font-bold">لوحة المدير</span>
+                        </button>
+                    </div>
+                </div>
+            );
+        }
+
+        function AdminPanel({ setView }) {
+            const [pass, setPass] = useState("");
+            const [isAuth, setIsAuth] = useState(false);
+            const [desc, setDesc] = useState("");
+            const [msg, setMsg] = useState("");
+            const [loading, setAI] = useState(false);
+
+            const handleAI = async () => {
+                setAI(true); setMsg("🤖 جاري التفكير...");
+                try {
+                    const prompt = `Generate 3 quiz questions in Arabic about ${desc}. Format: JSON array of {"question","options":["a","b","c","d"],"correct_index":0,"hint_text":"..."}`;
+                    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${GEMINI_API_KEY}`, {
+                        method: 'POST',
+                        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { responseMimeType: "application/json" } })
+                    });
+                    const data = await res.json();
+                    const questions = JSON.parse(data.candidates[0].content.parts[0].text);
+                    const col = window.fbUtils.collection(window.db, 'artifacts', appId, 'public', 'data', 'questions');
+                    for (let q of questions) { await window.fbUtils.addDoc(col, { ...q, category: "ثقافة عامة", createdAt: Date.now() }); }
+                    setMsg("✅ تم الحفظ!"); setDesc("");
+                } catch(e) { setMsg("⚠️ خطأ في التوليد"); }
+                finally { setAI(false); }
+            };
+
+            if (!isAuth) return (
+                <div className="flex flex-col items-center justify-center min-h-screen">
+                    <div className="glass p-10 rounded-[3rem] w-full max-w-sm text-center">
+                        <div className="text-6xl mb-6">🔒</div>
+                        <input type="password" placeholder="****" className="w-full bg-black/40 border border-white/10 p-4 rounded-2xl mb-4 text-center text-2xl" value={pass} onChange={e=>setPass(e.target.value)} />
+                        <button onClick={() => pass === "1234" ? setIsAuth(true) : alert("خطأ")} className="w-full bg-blue-600 py-4 rounded-2xl font-bold">دخول</button>
+                        <button onClick={() => setView('home')} className="mt-4 text-slate-500 block w-full text-center">إلغاء</button>
+                    </div>
+                </div>
+            );
+
+            return (
+                <div className="max-w-2xl mx-auto p-6 pt-12">
+                    <h1 className="text-3xl font-black mb-8">🛠️ إدارة الأسئلة</h1>
+                    <div className="glass p-8 rounded-[3rem] space-y-6">
+                        <textarea className="w-full bg-black/40 p-6 rounded-3xl min-h-[120px] outline-none border border-white/10" placeholder="عن ماذا تريد الأسئلة؟" value={desc} onChange={e=>setDesc(e.target.value)} />
+                        <button onClick={handleAI} disabled={loading} className="w-full bg-blue-600 py-5 rounded-3xl font-bold text-xl">
+                            {loading ? "جاري التوليد..." : "توليد بالذكاء الاصطناعي ✨"}
+                        </button>
+                        <button onClick={() => setView('home')} className="w-full text-slate-500">رجوع 🏠</button>
+                        {msg && <p className="text-center font-bold text-blue-400">{msg}</p>}
+                    </div>
+                </div>
+            );
+        }
+
+        function PlayerMode({ setView }) {
+            const [questions, setQuestions] = useState([]);
+            const [cur, setCur] = useState(0);
+            const [score, setScore] = useState(0);
+            const [status, setStatus] = useState('loading');
+
+            useEffect(() => {
+                const col = window.fbUtils.collection(window.db, 'artifacts', appId, 'public', 'data', 'questions');
+                return window.fbUtils.onSnapshot(col, (snap) => {
+                    setQuestions(snap.docs.map(d => d.data()).sort(() => 0.5 - Math.random()));
+                    setStatus('playing');
+                });
+            }, []);
+
+            if (status === 'loading') return <div className="min-h-screen flex items-center justify-center text-2xl">جاري سحب الأسئلة...</div>;
+            
+            if (cur >= questions.length && questions.length > 0) return (
+                <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center">
+                    <div className="glass p-16 rounded-[4rem] border-4 border-blue-500/20 shadow-2xl">
+                        <div className="text-9xl mb-8">🏆</div>
+                        <h2 className="text-4xl font-black mb-4">انتهى التحدي!</h2>
+                        <div className="text-8xl font-black text-blue-400 mb-8">{score}<span className="text-2xl text-slate-600">/{questions.length}</span></div>
+                        <button onClick={() => window.location.reload()} className="w-full bg-blue-600 py-6 rounded-3xl font-black text-2xl">تحدي جديد 🔄</button>
+                    </div>
+                </div>
+            );
+
+            const q = questions[cur];
+            if (!q) return <div className="text-center p-20">لا توجد أسئلة، أضف بعضها من لوحة المدير! <button onClick={()=>setView('home')} className="block mx-auto mt-4 underline">عودة</button></div>;
+
+            return (
+                <div className="max-w-4xl mx-auto p-6 flex flex-col min-h-screen">
+                    <div className="flex justify-between items-center mb-8 glass p-6 rounded-[2.5rem]">
+                        <div className="font-bold text-xl">سؤال {cur + 1}</div>
+                        <div className="text-2xl font-black text-emerald-400">🌟 {score}</div>
+                    </div>
+                    <div className="glass p-12 rounded-[4rem] text-center mb-8">
+                        <h2 className="text-4xl font-black mb-12 leading-relaxed">{q.question}</h2>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {q.options.map((opt, i) => (
+                                <button key={i} onClick={() => { if(i === q.correct_index) setScore(s=>s+1); setCur(c=>c+1); }} className="bg-black/40 border border-white/10 p-6 rounded-[2rem] text-xl font-bold hover:bg-blue-600 transition-all">
+                                    {opt}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
+
+
+```
